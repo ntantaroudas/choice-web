@@ -8,8 +8,7 @@ Choice Web is a project that uses SDEverywhere to convert Felix Vensim models in
 
 Before you begin, ensure you have the following installed:
 Node.js (which includes npm, the Node.js package manager)
-You can find it here:
-https://nodejs.org/en/download/prebuilt-installer
+You can find it here:  https://nodejs.org/en/download/prebuilt-installer
 
 ## Installation
 
@@ -27,13 +26,13 @@ npm create @sdeverywhere@latest
 
 4) Follow the wizard prompts to set up the project.
 
-Where would you like to create your new project? -> current directory
-Which template would you like to use? -> Default project
-Would you like to configure a graph to get you started? -> n
-Would you like to configure a few sliders to get you started? -> n
-Would you like to install the Emscripten SDK? -> Install under project directory
-Would you like to install npm dependencies? -> Y
-Would you like to initialize a new git repository? -> n
+Where would you like to create your new project? -> current directory  
+Which template would you like to use? -> Default project  
+Would you like to configure a graph to get you started? -> n  
+Would you like to configure a few sliders to get you started? -> n  
+Would you like to install the Emscripten SDK? -> Install under project directory  
+Would you like to install npm dependencies? -> Y  
+Would you like to initialize a new git repository? -> n  
 
 5) Copy the config and packages folders into the testing folder.
 
