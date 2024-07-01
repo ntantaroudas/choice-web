@@ -1,0 +1,101 @@
+1)Error with RANDOM POISSON
+
+Change this
+
+Poisson Arrivals=RANDOM POISSON(Minimum Number of Extreme Events,
+Maximum Number of Extreme Events,
+Extreme Event Mean,
+Poisson Distribution Shift,
+Poisson Distribution Stretch,
+S Stream ID)	Events/Year
+
+to just a mupltiplication
+
+Poisson Arrivals=Minimum Number of Extreme Events*Maximum Number of Extreme Events*Extreme Event Mean*Poisson Distribution Shift*Poisson Distribution Stretch*S Stream ID Events/Year
+
+
+2) Rename
+Population 65+ -> Population 65 plus
+
+Prevalence (model-based) -> Prevalence model-based
+
+Share of females aged 20-39 with sec+ education -> Share of females aged 20-39 with sec plus education
+
+Survivors in interval x x+5 -> Survivors in interval x x plus 5
+
+65+ -> 65 plus
+
+3)Error with DELAY1 functions
+The error: build/processed.c:12726:58: error: invalid operands to binary expression ('double' and 'double[4][2]') _potential_vegetarians[i][j][k] = (__level152[i][j][k] / __aux71[i]);
+
+Change this
+
+Potential vegetarians[Gender,Cohorts,Education]=
+	DELAY1I("Meat-based Diet Followers"[Gender,Cohorts,Education], 1, "Initial Meat-based Diet Followers"\
+		[Gender,Cohorts,Education])
+	~	People
+	~		|
+
+to a constant number for the time being
+
+Potential vegetarians[Gender,Cohorts,Education]=
+	100
+	~	People
+	~		|
+
+Remove DELAY1 from these
+
+Graduation Rate from Secondary Education[Gender, "15-19"]=
+	MIN(DELAY1(Enrollment Rate to Secondary Education[Gender,"10-14"]*(Interval duration\
+		+Interval duration-Average Secondary Education Duration
+	)/Interval duration, Average Secondary Education Duration),Maturation Rate[Gender,"15-19"\
+		]) ~~|
+Graduation Rate from Secondary Education[Gender,"20-24"]=
+	MIN(DELAY1(Enrollment Rate to Secondary Education[Gender,"15-19"]*(Interval duration\
+		+Interval duration-Average Secondary Education Duration
+	)/Interval duration
+	+Enrollment Rate to Secondary Education[Gender,"10-14"]*(Average Secondary Education Duration\
+		-Interval duration)/Interval duration
+	,Average Secondary Education Duration),Maturation Rate[Gender,"20-24"]) ~~|
+Graduation Rate from Secondary Education[Gender,"25-29"]=
+	MIN(DELAY1(Enrollment Rate to Secondary Education[Gender,"15-19"]*(Average Secondary Education Duration\
+		-Interval duration)/
+	Interval duration,
+	Average Secondary Education Duration),Maturation Rate[Gender,"25-29"])
+	~	People/Year
+	~	Conidering that the average secondary education duration is 6 yrs, 4/5 of the \
+		students enrolled when aged 10-14 graduate when they are 15-19. 1/5 of thm \
+		graduate at the 20-24 interval.
+		The same goes for the students enrolled when 15-19.
+	|
+
+and this
+
+Graduation Rate from Primary Education[Gender,"10-14"]=
+	MIN(DELAY1(Enrollment rate to primary education[Gender],Average Primary Education Duration\
+		)*(Interval duration+Interval duration
+	-Average Primary Education Duration)/Interval duration, Maturation Rate[Gender,"10-14"\
+		]) ~~|
+Graduation Rate from Primary Education[Gender,"15-19"]=
+	MIN(DELAY1(Enrollment rate to primary education[Gender],Average Primary Education Duration\
+		)*(Average Primary Education Duration
+	-Interval duration)/Interval duration,Maturation Rate[Gender,"15-19"])
+	~	People/Year
+	~		|
+
+and this
+
+Graduation Rate from Tertiary Education[Gender, "20-24"]=
+	MIN(DELAY1(Enrollment Rate to Tertiary Education[Gender,"15-19"],Average Tertiary Education Duration\
+		)*Persistence tertiary[
+	Gender],Maturation Rate[Gender,"20-24"]) ~~|
+Graduation Rate from Tertiary Education[Gender, "25-29"]=
+	MIN(DELAY1(Enrollment Rate to Tertiary Education[Gender,"20-24"], Average Tertiary Education Duration\
+		)*Persistence tertiary
+	[Gender],Maturation Rate[Gender,"25-29"]) ~~|
+Graduation Rate from Tertiary Education[Gender, "30-34"]=
+	MIN(DELAY1(Enrollment Rate to Tertiary Education[Gender,"25-29"],Average Tertiary Education Duration\
+		)*Persistence tertiary[
+	Gender],Maturation Rate[Gender,"30-34"])
+	~	People/Year
+	~		|
