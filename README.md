@@ -11,8 +11,7 @@ Node.js (which includes npm, the Node.js package manager)
 You can find it here:  
 https://nodejs.org/en/download/prebuilt-installer  
 
-For Windows Users, you also have to follow these instructions to fix python PATH:  
-[GitHub](https://github.com/climateinteractive/SDEverywhere/issues/359#issuecomment-2029636476)  
+For Windows Users, you also have to follow these instructions to fix python PATH: [GitHub Issues](https://github.com/climateinteractive/SDEverywhere/issues/359#issuecomment-2029636476)  
 
 ## Installation
 
