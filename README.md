@@ -9,7 +9,10 @@ Choice Web is a project that uses SDEverywhere to convert Felix Vensim models in
 Before you begin, ensure you have the following installed:  
 Node.js (which includes npm, the Node.js package manager)  
 You can find it here:  
-https://nodejs.org/en/download/prebuilt-installer
+https://nodejs.org/en/download/prebuilt-installer  
+
+For Windows Users, you also have to follow these instructions to fix python PATH:  
+[GitHub](https://github.com/climateinteractive/SDEverywhere/issues/359#issuecomment-2029636476)  
 
 ## Installation
 
@@ -31,13 +34,17 @@ npm create @sdeverywhere@latest
 
 4) Follow the wizard prompts to set up the project.
 
-Where would you like to create your new project? -> current directory  
-Which template would you like to use? -> Default project  
-Would you like to configure a graph to get you started? -> n  
-Would you like to configure a few sliders to get you started? -> n  
-Would you like to install the Emscripten SDK? -> Install under project directory  
-Would you like to install npm dependencies? -> Y  
-Would you like to initialize a new git repository? -> n  
+- Need to install the following packages:  
+@sdeverywhere/create@0.2.18  
+Ok to proceed? -> y  
+- Where would you like to create your new project? -> current directory  
+- Would you like your project to use WebAssembly? » - Use arrow-keys. Return to submit. -> Yes, generate a WebAssembly model
+- Which template would you like to use? -> Default project  
+- Would you like to configure a graph to get you started? -> n  
+- Would you like to configure a few sliders to get you started? -> n  
+- Would you like to install the Emscripten SDK? -> Install under project directory  
+- Would you like to install npm dependencies? -> Y  
+- Would you like to initialize a new git repository? -> n  
 
 5) Copy the config and packages folders into the testing folder.
 
