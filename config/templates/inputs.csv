@@ -1,4 +1,0 @@
-id,input type,viewid,varname,label,view level,group name,slider min,slider max,slider/switch default,slider step,units,format,reversed,range 2 start,range 3 start,range 4 start,range 5 start,range 1 label,range 2 label,range 3 label,range 4 label,range 5 label,enabled value,disabled value,controlled input ids,listing label,description
-1,slider,view1,CCS Scenario Variation,CCS Scenario Variation,,Sliders,0,1,0,1,(units),,,,,,,,,,,,,,,,
-2,slider,view1,Normal Fertility Variation,Normal Fertility Variation,,Sliders,0,15,0,0.5,(units),,,,,,,,,,,,,,,,
-3,slider,view1,Diet Composition Variation,Diet Composition Variation,,Sliders,0,4,0,1,(units),,,,,,,,,,,,,,,,

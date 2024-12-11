@@ -1,0 +1,7 @@
+FeliX3_YoGL_v25_fixedV1a
+- Add variables to extend input possibilities
+
+
+FeliX3_YoGL_v25_fixedV1
+- Fixed Issues: Random Poisson, Delay, "+" in naming
+- Extended Alternative Protein Section in Diet Change
