@@ -1,0 +1,5 @@
+id,input type,viewid,varname,label,view level,group name,slider min,slider max,slider/switch default,slider step,units,format,reversed,range 2 start,range 3 start,range 4 start,range 5 start,range 1 label,range 2 label,range 3 label,range 4 label,range 5 label,enabled value,disabled value,controlled input ids,listing label,description
+1,switch,diet,Diet Composition Variation,Diet Composition,,Switch,,,0,1,,,,,,,,,,,,,1,0,2;3|4,,
+2,slider,waste,Waste Fraction Variation[CropMeat],Crop Meat,Primary,Sliders,0,1,0,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+3,slider,waste,Waste Fraction Variation[Grains],Grains,Primary,Sliders,0,1,0,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+4,slider,waste,Waste Fraction Variation[VegFruits],Vegetables and Fruits,Primary,Sliders,0,1,0,0.01,Dmnl,.2f,,,,,,,,,,,,,,,

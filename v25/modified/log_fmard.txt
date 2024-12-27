@@ -1,0 +1,25 @@
+27/12/24
+
+1. Fixed typo in graphs.csv: "Commerical N application for agriculture" -> "Commercial N application for agriculture"
+(it generated undefined variable names)
+2. Changed "Total GHG Emissions from Agriculture" to "Total CO2 Emissions from Agriculture" in graphs.csv 
+(it generated undefined variable names)
+3. Changed "Healthy life expectancy at birth" to "Healthy life expectancy at birth[Male]" and "Healthy life expectancy at birth[Female]" 
+(because 'plot 1 variable' in graphs.csv needs to be of type 'double' and not of type 'double[2]' array)
+4. Provided an example graphs.csv for Stacked Graph (in folder 'stacked_graphs_example')
+5. Provided an example inputs.csv for Switch Type Variable (in folder 'switch_type_example')
+6. Provided a bigger config folder example (in folder 'config_v25_fixedV1_multiline')
+
+FOR STACKED GRAPHS:
+in graphs.csv:
+- change "kind" to "stacked-line"
+- change all "plot X style" to "area"
+
+FOR SWITCH TYPE VARIABLE:
+in inputs.csv:
+- change "input type" to "switch"
+- at "controlled input ids" put eg. (previous csv value),2;3|4;5,(next csv value) (this means that: 2,3 are active when the switch is off, and 4,5 are active when the switch is on.)
+
+TODO:
+(!) Still can't make the "v25.vdfx" file ("plot 1 source") work. Can't correctly recognize the "v25.vdfx" file as input.
+ERROR: No data available for _arable_land (source=v25.vdfx)
