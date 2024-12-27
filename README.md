@@ -46,9 +46,11 @@ Ok to proceed? -> y
 - Which template would you like to use? -> Default project  
 - Would you like to configure a graph to get you started? -> n  
 - Would you like to configure a few sliders to get you started? -> n  
-- Would you like to install the Emscripten SDK? -> Install under project directory  
+- Would you like to install the Emscripten SDK? -> Install under project directory[^1]
 - Would you like to install npm dependencies? -> Y  
 - Would you like to initialize a new git repository? -> n  
+
+[^1]: If you’re working with multiple models simultaneously, it’s wiser to select “Install under parent directory” here. The Emscripten SDK is approximately 1 GB, so there’s no need to have multiple copies. By installing it under the parent directory, SDEverywhere will locate it and share it across all future projects.
 
 5) Copy the config and packages folders into the testing folder.
 
