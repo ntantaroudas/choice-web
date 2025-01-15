@@ -1,0 +1,19 @@
+id,input type,viewid,varname,label,view level,group name,slider min,slider max,slider/switch default,slider step,units,format,reversed,range 2 start,range 3 start,range 4 start,range 5 start,range 1 label,range 2 label,range 3 label,range 4 label,range 5 label,enabled value,disabled value,controlled input ids,listing label,description
+1,slider,Diet Change - Meat,Target Percentage of Meat Eaters,Target Percentage of Conventional Dieters,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+2,slider,Diet Change - Meat,Meat Diet Composition Switch,Conventional Diet Composition Switch,Primary,Sliders,0,2,0,1,Dmnl,.0f,,1,2,,,Reference,Healthy,Flexitarian,,,,,,,Reference | Healthy | Flexitarian
+3,slider,Diet Change - Meat,Start Year of Meat Diet Switch,Start Year,Primary,Sliders,2000,2100,2020,1,Dmnl,.0f,,,,,,,,,,,,,,,
+4,slider,Diet Change - Meat,End Year of Meat Diet Switch,End Year,Primary,Sliders,2000,2100,2040,1,Dmnl,.0f,,,,,,,,,,,,,,,
+5,slider,Diet Change - Veg,Target Percentage of Vegetarians,Target Percentage of Alternative Dieters,Primary,Sliders,0,1,1,0.01,Dmnl,.0f,,,,,,,,,,,,,,,
+6,slider,Diet Change - Veg,Vegetarian Diet Composition Switch,Alternative Diet Composition Switch,Primary,Sliders,0,2,0,1,Dmnl,.0f,,1,2,,,Reference,Vegan,Flexitarian,,,,,,,Reference | Vegan | Flexitarian
+7,slider,Diet Change - Veg,Start Year of Vegetarian Diet Switch,Start Year,Primary,Sliders,2000,2100,2020,1,Dmnl,.0f,,,,,,,,,,,,,,,
+8,slider,Diet Change - Veg,End Year of Vegetarian Diet Switch,End Year,Primary,Sliders,2000,2100,2040,1,Dmnl,.0f,,,,,,,,,,,,,,,
+9,slider,Waste,Waste scenario switch,Food Waste Scenario Switch,Primary,switch,0,1,0,1,Dmnl,.0f,,,,,,,,,,,,,,,Supply Chain | Food Categories
+10,slider,Waste by Food,Waste Fraction Scenarios by Food Category[PasMeat],Pasture Meat,Primary,Sliders,0,1,0.2,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+11,slider,Waste by Food,Waste Fraction Scenarios by Food Category[CropMeat],Crop Meat,Primary,Sliders,0,1,0.2,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+12,slider,Waste by Food,Waste Fraction Scenarios by Food Category[Grains],Grains,Primary,Sliders,0,1,0.3,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+13,slider,Waste by Food,Waste Fraction Scenarios by Food Category[VegFruits],Vegetables and Fruits,Primary,Sliders,0,1,0.35,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+14,slider,Waste by Chain,Supply chain waste variation[Consumption],Consumption,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+15,slider,Waste by Chain,Supply chain waste variation[Distribution],Distribution,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+16,slider,Waste by Chain,Supply chain waste variation[Processing],Processing,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+17,slider,Waste by Chain,Supply chain waste variation[Distribution],Distribution ,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,
+18,slider,Waste by Chain,Supply chain waste variation[PrimaryProduction],Primary Production,Primary,Sliders,0,1,1,0.01,Dmnl,.2f,,,,,,,,,,,,,,,

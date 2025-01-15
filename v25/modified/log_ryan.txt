@@ -1,3 +1,8 @@
+FeliX3_YoGL_v25_fixedV1b
+- Removed all Random Functions
+- Add View CHOICE_Diet_RT and CHOICE_Waste_RT
+- Minor Edits to the Land Use and Diet Change View to add parameters
+
 FeliX3_YoGL_v25_fixedV1a
 - Add variables to extend input possibilities
 
