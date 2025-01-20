@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Model Explorer</title>
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <script type="module" src="./src/index.js"></script>
+  </head>
+
+  <body>
+    <div id="inputs-section">
+      <div id="input-selector-container">
+        <button class="input-selector-option" data-value="Diet">
+          Diet <br />
+          Change
+        </button>
+        <button class="input-selector-option" data-value="Food">
+          Food <br />
+          Waste
+        </button>
+        <button class="input-selector-option" data-value="Protein">
+          Alternative <br />
+          Protein
+        </button>
+        <button class="input-selector-option" data-value="Add">
+          Add <br />
+          Scenario
+        </button>
+      </div>
+      <div id="inputs-container" class="main-section">
+        <div id="inputs-content"></div>
+      </div>
+    </div>
+
+    <div id="graphs-section">
+      <div id="graph-selector-container">
+        <button class="graph-selector-option" data-value="Food">Food</button>
+        <button class="graph-selector-option" data-value="Climate">
+          Climate
+        </button>
+        <button class="graph-selector-option" data-value="LandUse">
+          Land Use
+        </button>
+        <button class="graph-selector-option" data-value="Fertilizer">
+          Fertilizer
+        </button>
+      </div>
+      <div id="graphs-container"></div>
+    </div>
+
+    <div class="overlay-container"></div>
+  </body>
+</html>
