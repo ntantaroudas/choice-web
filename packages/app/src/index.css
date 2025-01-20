@@ -87,7 +87,7 @@ p {
   display: flex; /* Arrange the options in a row */
   justify-content: center; /* Center the options horizontally */
   gap: 15px; /* Space between the buttons */
-  margin-top: 20px; /* Space above the selector */
+  margin-top: 5px; /* Space above the selector */
 }
 
 .graph-selector-option {
@@ -304,9 +304,16 @@ p {
 }
 
 .slider-handle {
-  width: 16px;
-  height: 16px;
-  background: #000;
+  background: none; /* Removes the default circle */
+}
+
+.slider-handle::before {
+  content: "\258C"; /* Unicode block character */
+  line-height: 20px;
+  font-size: 20px;
+  color: #000;
+  display: block;
+  text-align: center; /* Align with the range highlight */
 }
 
 .slider.slider-horizontal .slider-handle {

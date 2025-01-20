@@ -289,15 +289,16 @@ function showGraph(graphSpec, container) {
   // Show the legend items for the graph
   // (?) chartJs problem w/ canvas (?)
   // (?) Each canvas' parent container needs only the canvas as child. (?)
+  // https://github.com/chartjs/Chart.js/issues/5805
 
-  // const legendContainer = $('<div class="graph-legend"></div>');
-  // container.append(legendContainer);
-  // for (const itemSpec of graphSpec.legendItems) {
-  //   const attrs = `class="graph-legend-item" style="background-color: ${itemSpec.color}"`;
-  //   const label = str(itemSpec.labelKey);
-  //   const itemElem = $(`<div ${attrs}>${label}</div>`);
-  //   legendContainer.append(itemElem);
-  // }
+  const legendContainer = $('<div class="graph-legend"></div>');
+  container.append(legendContainer);
+  for (const itemSpec of graphSpec.legendItems) {
+    const attrs = `class="graph-legend-item" style="background-color: ${itemSpec.color}"`;
+    const label = str(itemSpec.labelKey);
+    const itemElem = $(`<div ${attrs}>${label}</div>`);
+    legendContainer.append(itemElem);
+  }
 
   return graphView;
 }
