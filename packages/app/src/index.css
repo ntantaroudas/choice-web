@@ -55,7 +55,7 @@ p {
 }
 
 .input-selector-option {
-  background-color: #4caf50; /* Green background for buttons */
+  background-color: #4b5563; /* Green background for buttons */
   color: white; /* White text color */
   padding: 5px 10px; /* Add some padding for the buttons */
   border: none; /* Remove default border */
@@ -66,16 +66,16 @@ p {
 }
 
 .input-selector-option:hover {
-  background-color: #39833c; /* Darker green on hover */
+  background-color: #1e3a8a; /* Darker green on hover */
   transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
 .input-selector-option:active {
-  background-color: #388e3c; /* Even darker green when clicked */
+  background-color: #1d4ed8; /* Even darker green when clicked */
 }
 
 .input-selector-option.selected {
-  background-color: #2196f3; /* Change color when selected */
+  background-color: #2563eb; /* Change color when selected */
   transform: scale(1.05); /* Slightly enlarge when selected */
 }
 
@@ -91,7 +91,7 @@ p {
 }
 
 .graph-selector-option {
-  background-color: #4caf50; /* Green background for buttons */
+  background-color: #4b5563; /* Green background for buttons */
   color: white; /* White text color */
   padding: 5px 10px; /* Add some padding for the buttons */
   border: none; /* Remove default border */
@@ -102,16 +102,16 @@ p {
 }
 
 .graph-selector-option:hover {
-  background-color: #39833c; /* Darker green on hover */
+  background-color: #1e3a8a; /* Darker green on hover */
   transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
 .graph-selector-option:active {
-  background-color: #388e3c; /* Even darker green when clicked */
+  background-color: #1d4ed8; /* Even darker green when clicked */
 }
 
 .graph-selector-option.selected {
-  background-color: #2196f3; /* Change color when selected */
+  background-color: #2563eb; /* Change color when selected */
   transform: scale(1.05); /* Slightly enlarge when selected */
 }
 
@@ -144,10 +144,10 @@ p {
  */
 .graph-container {
   position: relative;
-  width: 100%;
+  width: 31vw;
   height: 40vh;
-  margin-top: 10px;
-  margin-bottom: 30px;
+  padding-top: 10px;
+  padding-bottom: 30px;
 }
 
 /* Row for top graphs */
@@ -300,7 +300,7 @@ p {
 }
 
 .slider-rangeHighlight {
-  background: #5588ff;
+  background: #53bb37;
 }
 
 .slider-handle {

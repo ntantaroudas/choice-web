@@ -349,30 +349,27 @@ function initGraphsUI(category) {
   const bottomGraphRow = $('<div class="bottom-graph-row"></div>');
 
   if (coreConfig.graphs.size > 0) {
-    // Iterate over the coreConfig.graphs and filter by category
     for (const spec of coreConfig.graphs.values()) {
       if (categoryGraphIds.includes(spec.id)) {
         const graphContainer = $('<div class="graph-container"></div>');
 
-        // Add the graph to the top row if it's in the topRowGraphIds
+        // Add the graph to the appropriate row
         if (topRowGraphIds.includes(spec.id)) {
-          topGraphRow.append(graphContainer); // Add to the top row
-          const graphView = showGraph(spec, graphContainer);
-          graphViews.push(graphView); // Store the graph view
+          topGraphRow.append(graphContainer);
+        } else if (bottomRowGraphIds.includes(spec.id)) {
+          bottomGraphRow.append(graphContainer);
         }
 
-        // Add the graph to the bottom row if it's in the bottomRowGraphIds
-        else if (bottomRowGraphIds.includes(spec.id)) {
-          bottomGraphRow.append(graphContainer); // Add to the bottom row
+        // Add the graph rendering after a delay, so that it always has animations
+        setTimeout(() => {
           const graphView = showGraph(spec, graphContainer);
-          graphViews.push(graphView); // Store the graph view
-        }
+          graphViews.push(graphView);
+        }, 50);
       }
     }
 
-    // After processing, append the rows to the graphsContainer
-    graphsContainer.append(topGraphRow);
-    graphsContainer.append(bottomGraphRow);
+    // Append the rows to the graphsContainer
+    graphsContainer.append(topGraphRow).append(bottomGraphRow);
   } else {
     graphsContainer.text(
       `No graphs configured. You can edit 'config/graphs.csv' to get started.`
