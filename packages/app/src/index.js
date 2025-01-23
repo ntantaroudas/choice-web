@@ -151,16 +151,44 @@ function addSwitchItem(switchInput) {
  * Initialize the UI for the inputs menu and panel.
  */
 
-// jquery Click event for Selecting Input Category (Diet Change, Food Waste, Alternative Protein)
-$("#input-selector-container").on(
+// Click event for selecting a scenario
+$("#scenario-selector-container").on(
   "click",
-  ".input-selector-option",
+  ".scenario-selector-option",
   function () {
     // If the clicked button is already selected, do nothing
     if ($(this).hasClass("selected")) return;
 
     // Remove 'selected' class from all buttons
-    $(".input-selector-option").removeClass("selected");
+    $(".scenario-selector-option").removeClass("selected");
+
+    // Add 'selected' class to the clicked button
+    $(this).addClass("selected");
+
+    // Get the selected scenario value
+    const selectedScenario = $(this).data("value");
+
+    // Call the function to update the UI based on the selected scenario
+    updateScenario(selectedScenario);
+  }
+);
+
+// Example function to handle scenario selection
+function updateScenario(selectedScenario) {
+  console.log("Selected scenario:", selectedScenario);
+  // Add your logic here to handle the change in scenario
+}
+
+// jquery Click event for Selecting Input Category (Diet Change, Food Waste, Alternative Protein)
+$("#input-category-selector-container").on(
+  "click",
+  ".input-category-selector-option",
+  function () {
+    // If the clicked button is already selected, do nothing
+    if ($(this).hasClass("selected")) return;
+
+    // Remove 'selected' class from all buttons
+    $(".input-category-selector-option").removeClass("selected");
 
     // Add 'selected' class to the clicked button
     $(this).addClass("selected");
@@ -221,15 +249,15 @@ function initInputsUI(category) {
  */
 
 // jquery Click event for Selecting Graph Category (Food, Climate, LandUse, Fertilizer)
-$("#graph-selector-container").on(
+$("#graph-category-selector-container").on(
   "click",
-  ".graph-selector-option",
+  ".graph-category-selector-option",
   function () {
     // If the clicked button is already selected, do nothing
     if ($(this).hasClass("selected")) return;
 
     // Remove 'selected' class from all buttons
-    $(".graph-selector-option").removeClass("selected");
+    $(".graph-category-selector-option").removeClass("selected");
 
     // Add 'selected' class to the clicked button
     $(this).addClass("selected");
@@ -261,10 +289,73 @@ function createGraphViewModel(graphSpec) {
   };
 }
 
-function showGraph(graphSpec, container) {
-  const canvas = $("<canvas></canvas>")[0];
-  container.append(canvas);
+/**
+ * Create a dropdown selector for switching graphs.
+ */
+function createGraphSelector(category, currentGraphId, onGraphChange) {
+  const categoryGraphIds = graphCategories[category] || [];
+  const selector = $('<select class="graph-selector"></select>');
+
+  categoryGraphIds.forEach((graphId) => {
+    const graphSpec = coreConfig.graphs.get(graphId);
+    if (graphSpec) {
+      const option = $(
+        `<option value="${graphId}" ${
+          graphId === currentGraphId ? "selected" : ""
+        }>${str(graphSpec.titleKey)}</option>`
+      );
+      selector.append(option);
+    }
+  });
+
+  selector.on("change", function () {
+    const selectedGraphId = $(this).val();
+    if (onGraphChange) {
+      onGraphChange(selectedGraphId); // Trigger graph change for this selector
+    }
+  });
+
+  return selector;
+}
+
+function showGraph(graphSpec, outerContainer, category) {
+  // FOR TESTING. The user should be able to select any of these as the graph.
+  // Log all varNames from the datasets
+  if (graphSpec.datasets && Array.isArray(graphSpec.datasets)) {
+    const varNames = graphSpec.datasets.map((dataset) => dataset.varName);
+    console.log("VarNames in graphSpec:", varNames);
+  }
+  // Log the title of the graph
+  if (graphSpec.titleKey) {
+    const title = str(graphSpec.titleKey);
+    console.log("Graph Title:", title);
+  }
+  // ^^
+
+  // First, create the viewModel
   const viewModel = createGraphViewModel(graphSpec);
+
+  // Create the dropdown selector for switching graphs
+  const selector = createGraphSelector(category, graphSpec.id, (newGraphId) => {
+    const newGraphSpec = coreConfig.graphs.get(newGraphId);
+    if (newGraphSpec) {
+      outerContainer.empty(); // Clear the current graph
+      showGraph(newGraphSpec, outerContainer, category); // Render the new graph
+    }
+  });
+
+  const titleContainer = $('<div class="title-container"></div>');
+  titleContainer.append(selector);
+  outerContainer.append(titleContainer);
+
+  // Show the canvas/graph
+  const canvas = $("<canvas></canvas>")[0];
+  // innerContainer has the canvas, and only that.
+  // outerContainer is the "outer-graph-container"
+  const innerContainer = $('<div class="graph-container"></div>');
+  outerContainer.append(innerContainer);
+  innerContainer.append(canvas);
+
   const options = {
     fontFamily: "Helvetica, sans-serif",
     fontStyle: "bold",
@@ -287,12 +378,11 @@ function showGraph(graphSpec, container) {
   );
 
   // Show the legend items for the graph
-  // (?) chartJs problem w/ canvas (?)
-  // (?) Each canvas' parent container needs only the canvas as child. (?)
+  // Each canvas' parent container should have only the canvas as child.
   // https://github.com/chartjs/Chart.js/issues/5805
 
   const legendContainer = $('<div class="graph-legend"></div>');
-  container.append(legendContainer);
+  outerContainer.append(legendContainer);
   for (const itemSpec of graphSpec.legendItems) {
     const attrs = `class="graph-legend-item" style="background-color: ${itemSpec.color}"`;
     const label = str(itemSpec.labelKey);
@@ -332,6 +422,8 @@ const graphCategories = {
   Climate: ["cc1", "cc2", "cc3", "cc4"],
   LandUse: ["lu1", "lu2", "lu3", "lu4"],
   Fertilizer: ["fu1", "fu2", "fu3", "fu4"],
+  Biodiversity: ["bio1", "bio2", "bio3", "bio4"],
+  Water: ["water1", "water2", "water3", "water4"],
 };
 
 //fm - changed this to initialize graphs according to selected graph category
@@ -351,18 +443,20 @@ function initGraphsUI(category) {
   if (coreConfig.graphs.size > 0) {
     for (const spec of coreConfig.graphs.values()) {
       if (categoryGraphIds.includes(spec.id)) {
-        const graphContainer = $('<div class="graph-container"></div>');
+        const outerGraphContainer = $(
+          '<div class="outer-graph-container"></div>'
+        );
 
         // Add the graph to the appropriate row
         if (topRowGraphIds.includes(spec.id)) {
-          topGraphRow.append(graphContainer);
+          topGraphRow.append(outerGraphContainer);
         } else if (bottomRowGraphIds.includes(spec.id)) {
-          bottomGraphRow.append(graphContainer);
+          bottomGraphRow.append(outerGraphContainer);
         }
 
         // Add the graph rendering after a delay, so that it always has animations
         setTimeout(() => {
-          const graphView = showGraph(spec, graphContainer);
+          const graphView = showGraph(spec, outerGraphContainer, category);
           graphViews.push(graphView);
         }, 50);
       }
@@ -399,10 +493,13 @@ async function initApp() {
 
   // Also, mark the default buttons as "selected"
   $(
-    "#input-selector-container .input-selector-option[data-value='Diet']"
+    "#input-category-selector-container .input-category-selector-option[data-value='Diet']"
   ).addClass("selected");
   $(
-    "#graph-selector-container .graph-selector-option[data-value='Food']"
+    "#graph-category-selector-container .graph-category-selector-option[data-value='Food']"
+  ).addClass("selected");
+  $(
+    "#scenario-selector-container .scenario-selector-option[data-value='Scenario 1']"
   ).addClass("selected");
 
   // When the model outputs are updated, refresh all graphs

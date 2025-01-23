@@ -11,22 +11,26 @@
 
   <body>
     <div id="inputs-section">
-      <div id="input-selector-container">
-        <button class="input-selector-option" data-value="Diet">
+      <div id="input-category-selector-container">
+        <button class="input-category-selector-option" data-value="Diet">
           Diet <br />
           Change
         </button>
-        <button class="input-selector-option" data-value="Food">
+        <button class="input-category-selector-option" data-value="Food">
           Food <br />
           Waste
         </button>
-        <button class="input-selector-option" data-value="Protein">
+        <button class="input-category-selector-option" data-value="Protein">
           Alternative <br />
           Protein
         </button>
-        <button class="input-selector-option" data-value="Add">
-          Add <br />
-          Scenario
+      </div>
+      <div id="scenario-selector-container">
+        <button class="scenario-selector-option" data-value="Scenario 1">
+          Scenario 1
+        </button>
+        <button class="scenario-selector-option" data-value="Scenario 2">
+          Scenario 2
         </button>
       </div>
       <div id="inputs-container" class="main-section">
@@ -35,16 +39,27 @@
     </div>
 
     <div id="graphs-section">
-      <div id="graph-selector-container">
-        <button class="graph-selector-option" data-value="Food">Food</button>
-        <button class="graph-selector-option" data-value="Climate">
+      <div id="graph-category-selector-container">
+        <button class="graph-category-selector-option" data-value="Food">
+          Food
+        </button>
+        <button class="graph-category-selector-option" data-value="Climate">
           Climate
         </button>
-        <button class="graph-selector-option" data-value="LandUse">
+        <button class="graph-category-selector-option" data-value="LandUse">
           Land Use
         </button>
-        <button class="graph-selector-option" data-value="Fertilizer">
+        <button class="graph-category-selector-option" data-value="Fertilizer">
           Fertilizer
+        </button>
+        <button
+          class="graph-category-selector-option"
+          data-value="Biodiversity"
+        >
+          Biodiversity
+        </button>
+        <button class="graph-category-selector-option" data-value="Water">
+          Water
         </button>
       </div>
       <div id="graphs-container"></div>

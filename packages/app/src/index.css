@@ -23,7 +23,7 @@ p {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: #ddd;
+  background-color: #ececec;
   overflow-y: auto;
   box-sizing: border-box;
   padding: 10px;
@@ -45,16 +45,16 @@ p {
 * For Input Category Selection
 */
 
-#input-selector-container {
+#input-category-selector-container {
   display: flex; /* Arrange the options in a row */
   flex-direction: row;
   justify-content: center; /* Center the options horizontally */
-  gap: 10px; /* Space between the buttons */
+  justify-content: space-evenly;
   margin-top: 10px; /* Space above the selector */
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
-.input-selector-option {
+.input-category-selector-option {
   background-color: #4b5563; /* Green background for buttons */
   color: white; /* White text color */
   padding: 5px 10px; /* Add some padding for the buttons */
@@ -65,32 +65,91 @@ p {
   transition: background-color 0.1s ease, transform 0.1s ease; /* Smooth hover effect */
 }
 
-.input-selector-option:hover {
+.input-category-selector-option:hover {
   background-color: #1e3a8a; /* Darker green on hover */
   transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
-.input-selector-option:active {
+.input-category-selector-option:active {
   background-color: #1d4ed8; /* Even darker green when clicked */
 }
 
-.input-selector-option.selected {
+.input-category-selector-option.selected {
   background-color: #2563eb; /* Change color when selected */
   transform: scale(1.05); /* Slightly enlarge when selected */
+}
+
+/*
+* For Scenario Selection
+*/
+
+#scenario-selector-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  justify-content: space-evenly;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.scenario-selector-option {
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.1s ease, transform 0.1s ease;
+}
+
+/* First Scenario - Green */
+.scenario-selector-option:nth-child(1) {
+  background-color: #53bb37;
+}
+
+.scenario-selector-option:nth-child(1):hover {
+  background-color: #5ecb40;
+}
+
+.scenario-selector-option:nth-child(1):active {
+  background-color: #58c23a;
+}
+
+.scenario-selector-option:nth-child(1).selected {
+  background-color: #4fb033;
+  transform: scale(1.02);
+  border: 2px solid #3a8e2d; /* Dark green border */
+}
+
+/* Second Scenario - Red */
+.scenario-selector-option:nth-child(2) {
+  background-color: #d33700;
+}
+
+.scenario-selector-option:nth-child(2):hover {
+  background-color: #e34817;
+}
+
+.scenario-selector-option:nth-child(2):active {
+  background-color: #cc3c10;
+}
+
+.scenario-selector-option:nth-child(2).selected {
+  background-color: #c2330d;
+  transform: scale(1.02);
+  border: 2px solid #9e2809; /* Dark red border */
 }
 
 /*
 * For Graph Category Selection
 */
 
-#graph-selector-container {
+#graph-category-selector-container {
   display: flex; /* Arrange the options in a row */
   justify-content: center; /* Center the options horizontally */
-  gap: 15px; /* Space between the buttons */
+  justify-content: space-evenly;
   margin-top: 5px; /* Space above the selector */
 }
 
-.graph-selector-option {
+.graph-category-selector-option {
   background-color: #4b5563; /* Green background for buttons */
   color: white; /* White text color */
   padding: 5px 10px; /* Add some padding for the buttons */
@@ -101,16 +160,16 @@ p {
   transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effect */
 }
 
-.graph-selector-option:hover {
+.graph-category-selector-option:hover {
   background-color: #1e3a8a; /* Darker green on hover */
   transform: scale(1.05); /* Slightly enlarge the button on hover */
 }
 
-.graph-selector-option:active {
+.graph-category-selector-option:active {
   background-color: #1d4ed8; /* Even darker green when clicked */
 }
 
-.graph-selector-option.selected {
+.graph-category-selector-option.selected {
   background-color: #2563eb; /* Change color when selected */
   transform: scale(1.05); /* Slightly enlarge when selected */
 }
@@ -125,17 +184,6 @@ p {
   padding: 0 10px;
 }
 
-/*#graph-selector {
-  margin-top: 10px;
-}*/
-
-/* .graph-outer-container {
-  display: flex;
-  flex-direction: column;
-  margin-top: 10px;
-  margin-bottom: 20px;
-} */
-
 /*
  * This container is set up to allow for automatic responsive sizing
  * by Chart.js.  For this to work, we need the canvas element to have
@@ -145,9 +193,15 @@ p {
 .graph-container {
   position: relative;
   width: 31vw;
-  height: 40vh;
-  padding-top: 10px;
-  padding-bottom: 30px;
+  height: 36vh;
+  padding-top: 5px;
+  /* padding-bottom: 30px; */
+}
+
+/* Contains the Graph Title, the Graph, and the Graph Legend */
+.outer-graph-container {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Row for top graphs */
@@ -157,10 +211,31 @@ p {
   flex-direction: row; /* Display graphs side by side in each row */
 }
 
-/* #top-graph-container {
-  margin-top: 16px;
-  margin-bottom: 10px;
-} */
+/* Center-align title container and its content */
+.title-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px;
+}
+
+/* Graph selector "dropdown list" */
+.graph-selector {
+  appearance: none; /* Remove default browser styles */
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 3px 5px;
+  color: #333;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.graph-selector:hover {
+  background-color: #f1f1f1;
+  border-color: #aaa;
+}
 
 .graph-legend {
   display: flex;
@@ -188,7 +263,7 @@ p {
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
-  background-color: #ddd;
+  background-color: #ececec;
 }
 
 .input-title-row {
