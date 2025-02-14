@@ -1,9 +1,23 @@
-id,hex code,name,comment
-blue,#0072b2,,
-red,#d33700,,
-green,#53bb37,,
-gray,#a7a9ac,,
-black,#000000,,
-yellow,#f3c300,,new
-purple,#6a3d9a,,new
-cyan,#17becf,,new
+id,hex code,name,scheme1,scheme2,scheme3,scheme4,scheme5
+blue,#0072b2,,,,,,
+red,#d33700,,,,,,
+green,#53bb37,,,,,,
+gray,#a7a9ac,,,,Muted,,
+black,#000000,,,,,,
+yellow,#f3c300,,,,,,Bright & Vivid
+purple,#6a3d9a,,,,,,
+cyan,#17becf,,,,,,Bright & Vivid
+orange,#e66100,,,,,,
+pink,#ff69b4,,Pastels,,,,
+lime,#b3de69,,,,,,
+teal,#008080,,,,Muted,,
+navy,#000080,,,,Muted,,
+magenta,#ff00ff,,,,,,Bright & Vivid
+brown,#8b4513,,,,,Earthy,
+olive,#808000,,,,,Earthy,
+gold,#ffd700,,,Deep & Rich,,Earthy,
+indigo,#4b0082,,,Deep & Rich,,,
+turquoise,#40e0d0,,,,,,
+maroon,#800000,,,Deep & Rich,,,
+lavender,#e6e6fa,,Pastels,,,,
+peach,#ffdab9,,Pastels,,,,

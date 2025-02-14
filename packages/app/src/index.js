@@ -202,22 +202,11 @@ $("#input-category-selector-container").on(
 );
 
 const inputCategories = {
-  Diet: ["1", "2", "3", "4", "5", "6", "7", "8"],
-  Food: [
-    "9",
-    "10",
-    "11",
-    "12",
-    "13",
-    "14",
-    "15",
-    "16",
-    "17",
-    "18",
-    "19",
-    "20",
-    "21",
-  ],
+  Diet: ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "d20", "d21"
+    ],
+  Food: ["w1", "w2", "w3", "w4", "w5", "w6", "w7", "w8", "w9", "w10", "w11", "w12"
+    // , "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20" 
+    ],
   //Protein: ["", "", "", ""],
 };
 
@@ -418,10 +407,10 @@ function showGraph(graphSpec, outerContainer, category) {
 
 //fm
 const graphCategories = {
-  Food: ["food1", "food2", "food3", "food4"],
+  Food: ["food1", "food2", "food3", "food4", "food5", "food6", "food7", "food8"],
   Climate: ["cc1", "cc2", "cc3", "cc4"],
   LandUse: ["lu1", "lu2", "lu3", "lu4"],
-  Fertilizer: ["fu1", "fu2", "fu3", "fu4"],
+  Fertilizer: ["fu1", "fu2", "fu3", "fu4", "fu5", "fu6"],
   Biodiversity: ["bio1", "bio2", "bio3", "bio4"],
   Water: ["water1", "water2", "water3", "water4"],
 };
