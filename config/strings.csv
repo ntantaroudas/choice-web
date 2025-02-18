@@ -1,2 +1,3 @@
 id,string
 __model_name,My Model
+test_string,This is a test string for logging

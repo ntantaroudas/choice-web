@@ -202,11 +202,44 @@ $("#input-category-selector-container").on(
 );
 
 const inputCategories = {
-  Diet: ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "d12", "d13", "d14", "d15", "d16", "d17", "d18", "d19", "d20", "d21"
-    ],
-  Food: ["w1", "w2", "w3", "w4", "w5", "w6", "w7", "w8", "w9", "w10", "w11", "w12"
-    // , "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20" 
-    ],
+  Diet: [
+    "d1",
+    "d2",
+    "d3",
+    "d4",
+    "d5",
+    "d6",
+    "d7",
+    "d8",
+    "d9",
+    "d10",
+    "d11",
+    "d12",
+    "d13",
+    "d14",
+    "d15",
+    "d16",
+    "d17",
+    "d18",
+    "d19",
+    "d20",
+    "d21",
+  ],
+  Food: [
+    "w1",
+    "w2",
+    "w3",
+    "w4",
+    "w5",
+    "w6",
+    "w7",
+    "w8",
+    "w9",
+    "w10",
+    "w11",
+    "w12",
+    // , "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20"
+  ],
   //Protein: ["", "", "", ""],
 };
 
@@ -310,16 +343,25 @@ function createGraphSelector(category, currentGraphId, onGraphChange) {
 function showGraph(graphSpec, outerContainer, category) {
   // FOR TESTING. The user should be able to select any of these as the graph.
   // Log all varNames from the datasets
-  if (graphSpec.datasets && Array.isArray(graphSpec.datasets)) {
-    const varNames = graphSpec.datasets.map((dataset) => dataset.varName);
-    console.log("VarNames in graphSpec:", varNames);
-  }
-  // Log the title of the graph
-  if (graphSpec.titleKey) {
-    const title = str(graphSpec.titleKey);
-    console.log("Graph Title:", title);
-  }
+  // if (graphSpec.datasets && Array.isArray(graphSpec.datasets)) {
+  //   const varNames = graphSpec.datasets.map((dataset) => dataset.varName);
+  //   console.log("VarNames in graphSpec:", varNames);
+  // }
+  // // Log the title of the graph
+  // if (graphSpec.titleKey) {
+  //   const title = str(graphSpec.titleKey);
+  //   console.log("Graph Title:", title);
+  // }
   // ^^
+
+  // Check if there's a previous GraphView in this container and remove it from graphViews
+  const previousGraphView = outerContainer.data("graphView");
+  if (previousGraphView) {
+    const index = graphViews.indexOf(previousGraphView);
+    if (index > -1) {
+      graphViews.splice(index, 1);
+    }
+  }
 
   // First, create the viewModel
   const viewModel = createGraphViewModel(graphSpec);
@@ -357,6 +399,9 @@ function showGraph(graphSpec, outerContainer, category) {
   const yAxisLabel = graphSpec.yAxisLabelKey
     ? str(graphSpec.yAxisLabelKey)
     : undefined;
+
+  // Creation of a new GraphView
+  // Maybe use setTimeout here...
   const graphView = new GraphView(
     canvas,
     viewModel,
@@ -365,6 +410,10 @@ function showGraph(graphSpec, outerContainer, category) {
     xAxisLabel,
     yAxisLabel
   );
+
+  outerContainer.data("graphView", graphView);
+  graphViews.push(graphView);
+  // ...until here
 
   // Show the legend items for the graph
   // Each canvas' parent container should have only the canvas as child.
@@ -407,7 +456,16 @@ function showGraph(graphSpec, outerContainer, category) {
 
 //fm
 const graphCategories = {
-  Food: ["food1", "food2", "food3", "food4", "food5", "food6", "food7", "food8"],
+  Food: [
+    "food1",
+    "food2",
+    "food3",
+    "food4",
+    "food5",
+    "food6",
+    "food7",
+    "food8",
+  ],
   Climate: ["cc1", "cc2", "cc3", "cc4"],
   LandUse: ["lu1", "lu2", "lu3", "lu4"],
   Fertilizer: ["fu1", "fu2", "fu3", "fu4", "fu5", "fu6"],
@@ -428,6 +486,14 @@ function initGraphsUI(category) {
   // Create containers for the rows
   const topGraphRow = $('<div class="top-graph-row"></div>');
   const bottomGraphRow = $('<div class="bottom-graph-row"></div>');
+
+  // (!) logs the coreConfig object, which contains inputs, graphs specifications. (!)
+  // console.log(coreConfig);
+
+  // other useful logs
+  // console.log("Model Name:", enStrings.__model_name);
+  // console.log("Test String:", enStrings.test_string);
+  // console.log("Graph Default Min Time:", modelOptions.graphDefaultMinTime); // 1900
 
   if (coreConfig.graphs.size > 0) {
     for (const spec of coreConfig.graphs.values()) {
