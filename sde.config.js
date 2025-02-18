@@ -1,17 +1,17 @@
-import { dirname, join as joinPath } from 'path'
-import { fileURLToPath } from 'url'
+import { dirname, join as joinPath } from "path";
+import { fileURLToPath } from "url";
 
-import { checkPlugin } from '@sdeverywhere/plugin-check'
-import { configProcessor } from '@sdeverywhere/plugin-config'
-import { vitePlugin } from '@sdeverywhere/plugin-vite'
-import { wasmPlugin } from '@sdeverywhere/plugin-wasm'
-import { workerPlugin } from '@sdeverywhere/plugin-worker'
+import { checkPlugin } from "@sdeverywhere/plugin-check";
+import { configProcessor } from "@fmard/felix-plugin-config";
+import { vitePlugin } from "@sdeverywhere/plugin-vite";
+import { wasmPlugin } from "@sdeverywhere/plugin-wasm";
+import { workerPlugin } from "@sdeverywhere/plugin-worker";
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
-const configDir = joinPath(__dirname, 'config')
-const packagePath = (...parts) => joinPath(__dirname, 'packages', ...parts)
-const appPath = (...parts) => packagePath('app', ...parts)
-const corePath = (...parts) => packagePath('core', ...parts)
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const configDir = joinPath(__dirname, "config");
+const packagePath = (...parts) => joinPath(__dirname, "packages", ...parts);
+const appPath = (...parts) => packagePath("app", ...parts);
+const corePath = (...parts) => packagePath("core", ...parts);
 
 //
 // NOTE: This template can generate a model as a WebAssembly module (runs faster,
@@ -27,7 +27,7 @@ const corePath = (...parts) => packagePath('core', ...parts)
 // If `genFormat` is 'js', the sde compiler will generate JavaScript code that runs
 // in the browser or in Node.js without the additional Emscripten build step.
 //
-const genFormat = 'c'
+const genFormat = "c";
 
 export async function config() {
   return {
@@ -35,32 +35,32 @@ export async function config() {
     genFormat,
 
     // Specify the Vensim model to read
-    modelFiles: ['testing/FeliX3_YoGL_v25_fixedV1c.mdl'],
+    modelFiles: ["testing/FeliX3_YoGL_v25_fixedV1c.mdl"],
 
     // The following files will be hashed to determine whether the model needs
     // to be rebuilt when watch mode is active
-    modelInputPaths: ['testing/FeliX3_YoGL_v25_fixedV1c.mdl'],
+    modelInputPaths: ["testing/FeliX3_YoGL_v25_fixedV1c.mdl"],
 
     // The following files will cause the model to be rebuilt when watch mode is
     // is active.  Note that these are globs so we use forward slashes regardless
     // of platform.
-    watchPaths: ['config/**', 'testing/FeliX3_YoGL_v25_fixedV1c.mdl'],
+    watchPaths: ["config/**", "testing/FeliX3_YoGL_v25_fixedV1c.mdl"],
 
     // Read csv files from `config` directory
     modelSpec: configProcessor({
       config: configDir,
-      out: corePath()
+      out: corePath(),
     }),
 
     plugins: [
       // If targeting WebAssembly, generate a `generated-model.js` file
       // containing the Wasm model
-      genFormat === 'c' && wasmPlugin(),
+      genFormat === "c" && wasmPlugin(),
 
       // Generate a `worker.js` file that runs the model asynchronously on a
       // worker thread for improved responsiveness
       workerPlugin({
-        outputPaths: [corePath('src', 'model', 'generated', 'worker.js')]
+        outputPaths: [corePath("src", "model", "generated", "worker.js")],
       }),
 
       // Run model check
@@ -68,14 +68,14 @@ export async function config() {
 
       // Build or serve the model explorer app
       vitePlugin({
-        name: 'app',
+        name: "app",
         apply: {
-          development: 'serve'
+          development: "serve",
         },
         config: {
-          configFile: appPath('vite.config.js')
-        }
-      })
-    ]
-  }
+          configFile: appPath("vite.config.js"),
+        },
+      }),
+    ],
+  };
 }

@@ -315,7 +315,14 @@ function createGraphViewModel(graphSpec) {
  * Create a dropdown selector for switching graphs.
  */
 function createGraphSelector(category, currentGraphId, onGraphChange) {
-  const categoryGraphIds = graphCategories[category] || [];
+  // Get graph IDs for this category dynamically
+  const categoryGraphIds = [];
+  for (const spec of coreConfig.graphs.values()) {
+    if (spec.graphCategory === category) {
+      categoryGraphIds.push(spec.id);
+    }
+  }
+
   const selector = $('<select class="graph-selector"></select>');
 
   categoryGraphIds.forEach((graphId) => {
@@ -341,19 +348,6 @@ function createGraphSelector(category, currentGraphId, onGraphChange) {
 }
 
 function showGraph(graphSpec, outerContainer, category) {
-  // FOR TESTING. The user should be able to select any of these as the graph.
-  // Log all varNames from the datasets
-  // if (graphSpec.datasets && Array.isArray(graphSpec.datasets)) {
-  //   const varNames = graphSpec.datasets.map((dataset) => dataset.varName);
-  //   console.log("VarNames in graphSpec:", varNames);
-  // }
-  // // Log the title of the graph
-  // if (graphSpec.titleKey) {
-  //   const title = str(graphSpec.titleKey);
-  //   console.log("Graph Title:", title);
-  // }
-  // ^^
-
   // Check if there's a previous GraphView in this container and remove it from graphViews
   const previousGraphView = outerContainer.data("graphView");
   if (previousGraphView) {
@@ -431,55 +425,24 @@ function showGraph(graphSpec, outerContainer, category) {
   return graphView;
 }
 
-/**
- * Initialize the UI for the graphs panel.
- */
-
-// ORIGINAL initGraphsUI() function
-// function initGraphsUI() {
-//   const graphsContainer = $("#graphs-container");
-//   graphsContainer.empty();
-//   graphViews = []; // Reset graphViews
-//   if (coreConfig.graphs.size > 0) {
-//     for (const spec of coreConfig.graphs.values()) {
-//       const graphContainer = $('<div class="graph-container"></div>');
-//       graphsContainer.append(graphContainer);
-//       const graphView = showGraph(spec, graphContainer);
-//       graphViews.push(graphView); // Store each graphView
-//     }
-//   } else {
-//     graphsContainer.text(
-//       `No graphs configured. You can edit 'config/graphs.csv' to get started.`
-//     );
-//   }
-// }
-
-//fm
-const graphCategories = {
-  Food: [
-    "food1",
-    "food2",
-    "food3",
-    "food4",
-    "food5",
-    "food6",
-    "food7",
-    "food8",
-  ],
-  Climate: ["cc1", "cc2", "cc3", "cc4"],
-  LandUse: ["lu1", "lu2", "lu3", "lu4"],
-  Fertilizer: ["fu1", "fu2", "fu3", "fu4", "fu5", "fu6"],
-  Biodiversity: ["bio1", "bio2", "bio3", "bio4"],
-  Water: ["water1", "water2", "water3", "water4"],
-};
-
 //fm - changed this to initialize graphs according to selected graph category
 function initGraphsUI(category) {
   const graphsContainer = $("#graphs-container");
   graphsContainer.empty(); // Clear previous graphs
   graphViews = []; // Reset graphViews
 
-  const categoryGraphIds = graphCategories[category] || [];
+  // Dynamically build graph categories based on coreConfig.graphs
+  const dynamicGraphCategories = {};
+  for (const spec of coreConfig.graphs.values()) {
+    const graphCategory = spec.graphCategory;
+    if (!graphCategory) continue; // Skip graphs without a category. (!) probably unecessary, since it's a required field.
+    if (!dynamicGraphCategories[graphCategory]) {
+      dynamicGraphCategories[graphCategory] = [];
+    }
+    dynamicGraphCategories[graphCategory].push(spec.id);
+  }
+
+  const categoryGraphIds = dynamicGraphCategories[category] || [];
   const topRowGraphIds = categoryGraphIds.slice(0, 2); // First two graphs for the top row
   const bottomRowGraphIds = categoryGraphIds.slice(2, 4); // Next two graphs for the bottom row
 
@@ -488,12 +451,7 @@ function initGraphsUI(category) {
   const bottomGraphRow = $('<div class="bottom-graph-row"></div>');
 
   // (!) logs the coreConfig object, which contains inputs, graphs specifications. (!)
-  // console.log(coreConfig);
-
-  // other useful logs
-  // console.log("Model Name:", enStrings.__model_name);
-  // console.log("Test String:", enStrings.test_string);
-  // console.log("Graph Default Min Time:", modelOptions.graphDefaultMinTime); // 1900
+  console.log(coreConfig);
 
   if (coreConfig.graphs.size > 0) {
     for (const spec of coreConfig.graphs.values()) {
@@ -542,8 +500,25 @@ async function initApp() {
     return;
   }
 
+  // Generate category selector buttons
+  const categoryContainer = $("#graph-category-selector-container");
+  const categories = new Set( // Get unique categories
+    Array.from(coreConfig.graphs.values()).map((spec) => spec.graphCategory)
+  );
+
+  categories.forEach((category) => {
+    categoryContainer.append(
+      `<button class="graph-category-selector-option" data-value="${category}">
+        ${category}
+      </button>`
+    );
+  });
+
+  // Set default category to first available
+  const defaultCategory = categories.values().next().value || "Food";
+  initGraphsUI(defaultCategory);
+
   initInputsUI("Diet"); // "Diet Change" as default input category
-  initGraphsUI("Food"); // "Food" as default graph category
   initOverlay();
 
   // Also, mark the default buttons as "selected"
