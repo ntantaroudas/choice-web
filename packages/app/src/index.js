@@ -10,6 +10,9 @@ import { initOverlay } from "./dev-overlay";
 import { GraphView } from "./graph-view";
 
 let model;
+let modelB;
+let activeModel;
+
 let graphViews = [];
 
 /**
@@ -39,6 +42,7 @@ function format(num, formatString) {
 
 function addSliderItem(sliderInput) {
   const spec = sliderInput.spec;
+  // console.log(spec);
   const inputElemId = `input-${spec.id}`;
   const inputValue = $(`<div class="input-value"/>`);
   const titleRow = $(`<div class="input-title-row"/>`).append([
@@ -94,12 +98,12 @@ function addSliderItem(sliderInput) {
     slider.setAttribute("rangeHighlights", [{ start, end }]);
     updateValueElement(change.newValue);
     sliderInput.set(change.newValue);
-    // model.updateOutputs()
   });
 }
 
 function addSwitchItem(switchInput) {
   const spec = switchInput.spec;
+  // console.log(spec);
   const inputElemId = `input-${spec.id}`;
   function addCheckbox(desc) {
     const div = $(`<div class="input-item"/>`).append([
@@ -120,7 +124,7 @@ function addSwitchItem(switchInput) {
       } else {
         switchInput.set(spec.offValue);
       }
-      model.updateOutputs();
+      // activeModel.updateOutputs(); // remove? "activeModel.updateOutputs is not a function"
     });
   }
 
@@ -129,19 +133,19 @@ function addSwitchItem(switchInput) {
       "The following slider will have an effect only when this is checked."
     );
     for (const sliderId of spec.slidersActiveWhenOn) {
-      const slider = model.getInputForId(sliderId);
+      const slider = activeModel.getInputForId(sliderId);
       addSliderItem(slider);
     }
   } else {
     for (const sliderId of spec.slidersActiveWhenOff) {
-      const slider = model.getInputForId(sliderId);
+      const slider = activeModel.getInputForId(sliderId);
       addSliderItem(slider);
     }
     addCheckbox(
       "When this is unchecked, only the slider above has an effect, and the ones below are inactive (and vice versa)."
     );
     for (const sliderId of spec.slidersActiveWhenOn) {
-      const slider = model.getInputForId(sliderId);
+      const slider = activeModel.getInputForId(sliderId);
       addSliderItem(slider);
     }
   }
@@ -176,7 +180,20 @@ $("#scenario-selector-container").on(
 // Example function to handle scenario selection
 function updateScenario(selectedScenario) {
   console.log("Selected scenario:", selectedScenario);
-  // Add your logic here to handle the change in scenario
+  // The logic to handle the change in scenario
+  activeModel = selectedScenario === "Scenario 2" ? modelB : model;
+
+  // Green highlight for Scenario 1,
+  // Red highlight for Scenario 2
+  document.body.classList.toggle(
+    "scenario-2",
+    selectedScenario === "Scenario 2"
+  );
+
+  const selectedCategory = $(".input-category-selector-option.selected").data(
+    "value"
+  );
+  initInputsUI(selectedCategory);
 }
 
 // jquery Click event for Selecting Input Category (Diet Change, Food Waste, Alternative Protein)
@@ -201,62 +218,35 @@ $("#input-category-selector-container").on(
   }
 );
 
-const inputCategories = {
-  Diet: [
-    "d1",
-    "d2",
-    "d3",
-    "d4",
-    "d5",
-    "d6",
-    "d7",
-    "d8",
-    "d9",
-    "d10",
-    "d11",
-    "d12",
-    "d13",
-    "d14",
-    "d15",
-    "d16",
-    "d17",
-    "d18",
-    "d19",
-    "d20",
-    "d21",
-  ],
-  Food: [
-    "w1",
-    "w2",
-    "w3",
-    "w4",
-    "w5",
-    "w6",
-    "w7",
-    "w8",
-    "w9",
-    "w10",
-    "w11",
-    "w12",
-    // , "w13", "w14", "w15", "w16", "w17", "w18", "w19", "w20"
-  ],
-  //Protein: ["", "", "", ""],
-};
-
 //
 function initInputsUI(category) {
   $("#inputs-content").empty();
 
-  const categoryInputIds = inputCategories[category] || [];
+  // Dynamically build input categories based on coreConfig.inputs
+  const dynamicInputCategories = {};
+  for (const inputSpec of coreConfig.inputs.values()) {
+    const inputCategory = inputSpec.categoryId;
+    if (!inputCategory) continue; // Skip inputs without a category (shouldn't happen if category is required)
+
+    if (!dynamicInputCategories[inputCategory]) {
+      dynamicInputCategories[inputCategory] = [];
+    }
+    dynamicInputCategories[inputCategory].push(inputSpec.id);
+  }
+
+  const categoryInputIds = dynamicInputCategories[category] || [];
 
   if (coreConfig.inputs.size > 0) {
     for (const inputId of coreConfig.inputs.keys()) {
       if (categoryInputIds.includes(inputId)) {
-        const input = model.getInputForId(inputId);
+        const input = activeModel.getInputForId(inputId);
+        // const inputB = modelB.getInputForId(inputId);
         if (input.kind === "slider") {
           addSliderItem(input);
+          // addSliderItem(inputB);
         } else if (input.kind === "switch") {
           addSwitchItem(input);
+          // addSwitchItem(inputB);
         }
       }
     }
@@ -292,9 +282,10 @@ $("#graph-category-selector-container").on(
   }
 );
 
-function createGraphViewModel(graphSpec) {
+function createGraphViewModel(graphSpec, model) {
   return {
     spec: graphSpec,
+    model: model,
     style: "normal",
     getLineWidth: () => window.innerWidth * (0.5 / 100),
     getScaleLabelFontSize: () => window.innerWidth * (1.2 / 100),
@@ -358,7 +349,8 @@ function showGraph(graphSpec, outerContainer, category) {
   }
 
   // First, create the viewModel
-  const viewModel = createGraphViewModel(graphSpec);
+  const modelToUse = graphSpec.levels === "Scenario2" ? modelB : model; // fm - added this line
+  const viewModel = createGraphViewModel(graphSpec, modelToUse); // fm - added "modelToUse"
 
   // Create the dropdown selector for switching graphs
   const selector = createGraphSelector(category, graphSpec.id, (newGraphId) => {
@@ -495,35 +487,52 @@ function initGraphsUI(category) {
 async function initApp() {
   try {
     model = await createModel();
+    modelB = await createModel();
+    activeModel = model;
   } catch (e) {
     console.error(`ERROR: Failed to load model: ${e.message}`);
     return;
   }
 
-  // Generate category selector buttons
-  const categoryContainer = $("#graph-category-selector-container");
-  const categories = new Set( // Get unique categories
+  // Generate GRAPH category selector buttons
+  const graphCategoryContainer = $("#graph-category-selector-container");
+  const graphCategories = new Set( // Get unique categories
     Array.from(coreConfig.graphs.values()).map((spec) => spec.graphCategory)
   );
 
-  categories.forEach((category) => {
-    categoryContainer.append(
-      `<button class="graph-category-selector-option" data-value="${category}">
-        ${category}
+  graphCategories.forEach((graphCategory) => {
+    graphCategoryContainer.append(
+      `<button class="graph-category-selector-option" data-value="${graphCategory}">
+        ${graphCategory}
       </button>`
     );
   });
 
-  // Set default category to first available
-  const defaultCategory = categories.values().next().value || "Food";
-  initGraphsUI(defaultCategory);
+  // Generate INPUT category selector buttons
+  const inputCategoryContainer = $("#input-category-selector-container");
+  const inputCategories = new Set(
+    Array.from(coreConfig.inputs.values()).map((spec) => spec.categoryId)
+  );
 
-  initInputsUI("Diet"); // "Diet Change" as default input category
+  inputCategories.forEach((inputCategory) => {
+    inputCategoryContainer.append(
+      `<button class="input-category-selector-option" data-value="${inputCategory}">${inputCategory}</button>`
+    );
+  });
+
+  // Set default graph and input categories to first available
+  const defaultGraphCategory = graphCategories.values().next().value || "Food";
+  const defaultInputCategory =
+    inputCategories.values().next().value || "Diet Change";
+
+  initGraphsUI(defaultGraphCategory);
+  initInputsUI(defaultInputCategory);
+
   initOverlay();
 
   // Also, mark the default buttons as "selected"
   $(
-    "#input-category-selector-container .input-category-selector-option[data-value='Diet']"
+    "#input-category-selector-container .input-category-selector-option[data-value='Diet Change']"
   ).addClass("selected");
   $(
     "#graph-category-selector-container .graph-category-selector-option[data-value='Food']"
@@ -534,6 +543,9 @@ async function initApp() {
 
   // When the model outputs are updated, refresh all graphs
   model.onOutputsChanged = () => {
+    graphViews.forEach((graphView) => graphView.updateData());
+  };
+  modelB.onOutputsChanged = () => {
     graphViews.forEach((graphView) => graphView.updateData());
   };
 }

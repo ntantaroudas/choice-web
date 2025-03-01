@@ -1,11 +1,17 @@
-import type { InputValue, InputVarId, ModelRunner, OutputVarId, Series } from '@sdeverywhere/runtime'
-import { ModelScheduler, Outputs } from '@sdeverywhere/runtime'
-import { spawnAsyncModelRunner } from '@sdeverywhere/runtime-async'
-import type { InputId } from '../config/generated/spec-types'
-import { config } from '../config/config'
-import type { Input } from './inputs'
-import { createModelInput, createSimpleInputValue } from './inputs'
-import modelWorkerJs from './generated/worker.js?raw'
+import type {
+  InputValue,
+  InputVarId,
+  ModelRunner,
+  OutputVarId,
+  Series,
+} from "@sdeverywhere/runtime";
+import { ModelScheduler, Outputs } from "@sdeverywhere/runtime";
+import { spawnAsyncModelRunner } from "@sdeverywhere/runtime-async";
+import type { InputId } from "../config/generated/spec-types";
+import { config } from "../config/config";
+import type { Input } from "./inputs";
+import { createModelInput, createSimpleInputValue } from "./inputs";
+import modelWorkerJs from "./generated/worker.js?raw";
 
 /**
  * High-level interface to the runnable model.
@@ -17,17 +23,17 @@ import modelWorkerJs from './generated/worker.js?raw'
  */
 export class Model {
   /** The model scheduler. */
-  private readonly scheduler: ModelScheduler
+  private readonly scheduler: ModelScheduler;
 
   /**
    * The structure into which the model outputs will be stored.
    */
-  private outputs: Outputs
+  private outputs: Outputs;
 
   /**
    * Called when the outputs have been updated after a model run.
    */
-  public onOutputsChanged?: () => void
+  public onOutputsChanged?: () => void;
 
   constructor(
     runner: ModelRunner,
@@ -35,13 +41,13 @@ export class Model {
     initialOutputs: Outputs,
     private readonly refData: ReadonlyMap<OutputVarId, Series>
   ) {
-    const inputsArray = Array.from(inputs.values())
-    this.outputs = initialOutputs
-    this.scheduler = new ModelScheduler(runner, inputsArray, initialOutputs)
-    this.scheduler.onOutputsChanged = outputs => {
-      this.outputs = outputs
-      this.onOutputsChanged?.()
-    }
+    const inputsArray = Array.from(inputs.values());
+    this.outputs = initialOutputs;
+    this.scheduler = new ModelScheduler(runner, inputsArray, initialOutputs);
+    this.scheduler.onOutputsChanged = (outputs) => {
+      this.outputs = outputs;
+      this.onOutputsChanged?.();
+    };
   }
 
   /**
@@ -49,7 +55,7 @@ export class Model {
    * no input for that ID.
    */
   public getInputForId(inputId: InputId): Input | undefined {
-    return this.inputs.get(inputId)
+    return this.inputs.get(inputId);
   }
 
   /**
@@ -59,13 +65,16 @@ export class Model {
    * @param sourceName The external data source name (e.g. "Ref"), or
    * undefined to use the latest model output data.
    */
-  public getSeriesForVar(varId: OutputVarId, sourceName?: string): Series | undefined {
+  public getSeriesForVar(
+    varId: OutputVarId,
+    sourceName?: string
+  ): Series | undefined {
     if (sourceName === undefined) {
       // Return the latest model output data
-      return this.outputs.getSeriesForVar(varId)
-    } else if (sourceName === 'Ref') {
+      return this.outputs.getSeriesForVar(varId);
+    } else if (sourceName === "Ref") {
       // Return the saved reference data
-      return this.refData.get(varId)
+      return this.refData.get(varId);
     } else {
       // TODO: Add support for static/external data
       // // Return the static external data
@@ -76,7 +85,7 @@ export class Model {
       //     return new Series(varId, points)
       //   }
       // }
-      return undefined
+      return undefined;
     }
   }
 }
@@ -90,42 +99,44 @@ export class Model {
 export async function createModel(): Promise<Model> {
   // Initialize the wasm model asynchronously.  We inline the worker code in the
   // rolled-up bundle, so that we don't have to fetch a separate `worker.js` file.
-  const runner = await spawnAsyncModelRunner({ source: modelWorkerJs })
+  const runner = await spawnAsyncModelRunner({ source: modelWorkerJs });
 
   // Run the model with inputs set to their default values
-  const defaultInputs: InputValue[] = []
+  const defaultInputs: InputValue[] = [];
   for (const inputSpec of config.inputs.values()) {
-    defaultInputs.push(createSimpleInputValue(inputSpec.varId, inputSpec.defaultValue))
+    defaultInputs.push(
+      createSimpleInputValue(inputSpec.varId, inputSpec.defaultValue)
+    );
   }
-  const defaultOutputs = runner.createOutputs()
-  const initialOutputs = await runner.runModel(defaultInputs, defaultOutputs)
+  const defaultOutputs = runner.createOutputs();
+  const initialOutputs = await runner.runModel(defaultInputs, defaultOutputs);
 
   // Capture data from the reference run for the given variables; note that we
   // must copy the series data, since the `Outputs` instance can be reused by
   // the runner and otherwise the data might be overwritten
-  const refData: Map<OutputVarId, Series> = new Map()
-  const refVarIds = getRefOutputs()
+  const refData: Map<OutputVarId, Series> = new Map();
+  const refVarIds = getRefOutputs();
   for (const refVarId of refVarIds) {
-    const refSeries = initialOutputs.getSeriesForVar(refVarId)
+    const refSeries = initialOutputs.getSeriesForVar(refVarId);
     if (refSeries) {
-      refData.set(refVarId, refSeries.copy())
+      refData.set(refVarId, refSeries.copy());
     } else {
-      console.error(`ERROR: No reference data available for ${refVarId}`)
+      console.error(`ERROR: No reference data available for ${refVarId}`);
     }
   }
 
   // Create the `Model` instance
-  const initialInputs = createInputs()
-  return new Model(runner, initialInputs, initialOutputs, refData)
+  const initialInputs = createInputs();
+  return new Model(runner, initialInputs, initialOutputs, refData);
 }
 
 function createInputs(): Map<InputVarId, Input> {
-  const orderedInputs: Map<InputVarId, Input> = new Map()
+  const orderedInputs: Map<InputVarId, Input> = new Map();
   for (const inputSpec of config.inputs.values()) {
-    const input = createModelInput(inputSpec)
-    orderedInputs.set(input.spec.id, input)
+    const input = createModelInput(inputSpec);
+    orderedInputs.set(input.spec.id, input);
   }
-  return orderedInputs
+  return orderedInputs;
 }
 
 /**
@@ -136,13 +147,13 @@ function createInputs(): Map<InputVarId, Input> {
 function getRefOutputs(): Set<OutputVarId> {
   // Gather the set of output variables that appear with a "Ref" dataset
   // in one or more graph specs
-  const refVarIds: Set<OutputVarId> = new Set()
+  const refVarIds: Set<OutputVarId> = new Set();
   for (const graphSpec of config.graphs.values()) {
     for (const dataset of graphSpec.datasets) {
-      if (dataset.externalSourceName === 'Ref') {
-        refVarIds.add(dataset.varId)
+      if (dataset.externalSourceName === "Ref") {
+        refVarIds.add(dataset.varId);
       }
     }
   }
-  return refVarIds
+  return refVarIds;
 }
