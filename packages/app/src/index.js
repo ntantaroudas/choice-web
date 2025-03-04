@@ -37,6 +37,45 @@ function format(num, formatString) {
 }
 
 /*
+ * fm - Function to position tooltip correctly
+ */
+
+function positionTooltip(tooltip) {
+  const icon = tooltip.siblings(".info-icon");
+  const iconRect = icon[0].getBoundingClientRect();
+  const tooltipElem = tooltip[0];
+
+  // Get tooltip dimensions
+  const tooltipWidth = tooltipElem.offsetWidth;
+  const tooltipHeight = tooltipElem.offsetHeight;
+
+  // Default position: below the icon, centered
+  let top = iconRect.bottom + 5;
+  let left = iconRect.left + iconRect.width / 2 - tooltipWidth / 2;
+
+  // Adjust for right edge
+  if (left + tooltipWidth > window.innerWidth) {
+    left = window.innerWidth - tooltipWidth - 5;
+  }
+
+  // Adjust for left edge
+  if (left < 0) {
+    left = 5;
+  }
+
+  // Adjust for bottom edge
+  if (top + tooltipHeight > window.innerHeight) {
+    top = iconRect.top - tooltipHeight - 5;
+  }
+
+  // Apply corrected position
+  tooltip.css({
+    top: `${top}px`,
+    left: `${left}px`,
+  });
+}
+
+/*
  * INPUTS
  */
 
@@ -45,10 +84,50 @@ function addSliderItem(sliderInput) {
   // console.log(spec);
   const inputElemId = `input-${spec.id}`;
   const inputValue = $(`<div class="input-value"/>`);
+
+  // Create info icon if description exists
+  // and Position it correctly, inside the viewport (!).
+  let infoIcon = null;
+  if (spec.hoverDescription) {
+    const infoIconContainer = $('<div class="info-icon-container">');
+    const icon = $('<div class="info-icon">i</div>');
+    const tooltip = $(`<div class="tooltip">${spec.hoverDescription}</div>`);
+    infoIconContainer.append(icon, tooltip);
+    infoIcon = infoIconContainer;
+
+    // Event listeners for positioning and visibility
+    icon.on("mouseenter", function () {
+      positionTooltip(tooltip);
+      tooltip.css("visibility", "visible");
+    });
+
+    icon.on("mouseleave", function () {
+      tooltip.css("visibility", "hidden");
+    });
+  }
+
+  // Title + Info Icon container. This should be in the far left.
+  const sliderTitleAndInfoContainer = $(
+    '<div class="slider-title-and-info-container"/>'
+  ).append(
+    [
+      $(`<div class="input-title">${str(spec.labelKey)}</div>`),
+      infoIcon,
+    ].filter((el) => el !== null)
+  );
+
+  // Value + Units container. This should be in the far right.
+  const valueUnitsContainer = $('<div class="value-units-container"/>').append(
+    [
+      inputValue,
+      $(`<div class="input-units">${str(spec.unitsKey)}</div>`),
+    ].filter((el) => el !== null)
+  );
+
+  // Title row with left and right sections
   const titleRow = $(`<div class="input-title-row"/>`).append([
-    $(`<div class="input-title">${str(spec.labelKey)}</div>`),
-    inputValue,
-    $(`<div class="input-units">${str(spec.unitsKey)}</div>`),
+    sliderTitleAndInfoContainer,
+    valueUnitsContainer,
   ]);
 
   let tickPos =

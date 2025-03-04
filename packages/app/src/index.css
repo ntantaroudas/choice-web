@@ -155,7 +155,7 @@ p {
 }
 
 .graph-category-selector-option {
-  background-color: #4b5563; /* Green background for buttons */
+  background-color: #4b5563; /* Gray background for buttons */
   color: white; /* White text color */
   padding: 5px 10px; /* Add some padding for the buttons */
   border: none; /* Remove default border */
@@ -257,7 +257,7 @@ p {
 }
 
 /*
- * Bottom panel: sliders and switches
+ * Left panel: sliders and switches
  */
 
 #inputs-container {
@@ -329,6 +329,60 @@ p {
   color: #111;
   vertical-align: middle;
   margin-left: 6px;
+}
+
+/*
+ * Info box
+ */
+
+/* Container for title + info icon */
+.slider-title-and-info-container {
+  display: inline-flex;
+  gap: 4px;
+  position: relative;
+}
+
+.info-icon-container {
+  display: inline-block;
+  position: relative;
+}
+
+.info-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #4b5563;
+  color: white;
+  text-align: center;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: help;
+}
+
+.tooltip {
+  visibility: hidden;
+  position: fixed;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1.4;
+  z-index: 1000;
+  pointer-events: none;
+  min-width: 200px;
+  max-width: 300px;
+  text-align: center;
+  white-space: normal;
+  display: block;
+}
+
+.value-units-container {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Space between value and units */
+  margin-left: auto; /* Force this container to the right */
 }
 
 /*
