@@ -300,7 +300,7 @@ p {
 .input-desc {
   font-style: italic;
   color: #333;
-  margin-bottom: 24px;
+  margin-top: 5px;
 }
 
 .input-slider-row {
@@ -330,6 +330,93 @@ p {
   vertical-align: middle;
   margin-left: 6px;
 }
+
+/*
+ * Input Dropdowns
+ */
+
+/* Dropdown group container */
+.input-dropdown-group {
+  padding: 0px 5px 0px 5px;
+  margin: 12px 0;
+  border: 1px solid #989898;
+  border-radius: 8px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.input-dropdown-group:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown header containing main input */
+/* .dropdown-header {
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 8px 8px 0 0;
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-header:hover {
+  background-color: #f1f5f9;
+} */
+
+/* Expand/collapse button */
+.expand-button {
+  left: 12px;
+  margin-right: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: #e2e8f0;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #475569;
+  font-size: 12px;
+  padding: 0;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expand-button:hover {
+  background: #cbd5e1;
+  color: #334155;
+}
+
+/* Dropdown content with assumptions */
+/* .dropdown-content {
+  padding: 8px 12px 12px 44px;
+  background: #ffffff;
+  border-radius: 0 0 8px 8px;
+  border-top: 1px solid #e2e8f0;
+} */
+
+/* Nested inputs in dropdown */
+/* .dropdown-content .input-item {
+  margin: 8px 0;
+  padding: 8px;
+  background: #f8fafc;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+} */
+
+/* Compact spacing for grouped inputs */
+.input-item {
+  margin: 6px 0;
+  padding: 6px;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+/* Hover effect for standalone inputs */
+/* .input-item:not(.dropdown-content .input-item):hover {
+  background: #f8fafc;
+} */
 
 /*
  * Info box

@@ -79,7 +79,7 @@ function positionTooltip(tooltip) {
  * INPUTS
  */
 
-function addSliderItem(sliderInput) {
+function addSliderItem(sliderInput, container = $("#inputs-content")) {
   const spec = sliderInput.spec;
   // console.log(spec);
   const inputElemId = `input-${spec.id}`;
@@ -150,7 +150,7 @@ function addSliderItem(sliderInput) {
     ),
   ]);
 
-  $("#inputs-content").append(div);
+  container.append(div);
 
   const value = sliderInput.get();
   const slider = new Slider(`#${inputElemId}`, {
@@ -178,6 +178,7 @@ function addSliderItem(sliderInput) {
     updateValueElement(change.newValue);
     sliderInput.set(change.newValue);
   });
+  return div; // fm
 }
 
 function addSwitchItem(switchInput) {
@@ -301,36 +302,86 @@ $("#input-category-selector-container").on(
 function initInputsUI(category) {
   $("#inputs-content").empty();
 
-  // Dynamically build input categories based on coreConfig.inputs
+  // Group inputs by categoryId and input group
   const dynamicInputCategories = {};
   for (const inputSpec of coreConfig.inputs.values()) {
     const inputCategory = inputSpec.categoryId;
-    if (!inputCategory) continue; // Skip inputs without a category (shouldn't happen if category is required)
+    const inputGroup = inputSpec.inputGroup;
+    if (!inputCategory || !inputGroup) continue;
 
     if (!dynamicInputCategories[inputCategory]) {
-      dynamicInputCategories[inputCategory] = [];
+      dynamicInputCategories[inputCategory] = {};
     }
-    dynamicInputCategories[inputCategory].push(inputSpec.id);
+    if (!dynamicInputCategories[inputCategory][inputGroup]) {
+      dynamicInputCategories[inputCategory][inputGroup] = [];
+    }
+    dynamicInputCategories[inputCategory][inputGroup].push(inputSpec);
   }
 
-  const categoryInputIds = dynamicInputCategories[category] || [];
+  const categoryGroups = dynamicInputCategories[category] || {};
 
   if (coreConfig.inputs.size > 0) {
-    for (const inputId of coreConfig.inputs.keys()) {
-      if (categoryInputIds.includes(inputId)) {
-        const input = activeModel.getInputForId(inputId);
-        // const inputB = modelB.getInputForId(inputId);
-        if (input.kind === "slider") {
-          addSliderItem(input);
-          // addSliderItem(inputB);
-        } else if (input.kind === "switch") {
-          addSwitchItem(input);
-          // addSwitchItem(inputB);
+    Object.entries(categoryGroups).forEach(([groupName, groupInputs]) => {
+      const standaloneInputs = [];
+      let mainInput = null;
+      const assumptionInputs = [];
+
+      groupInputs.forEach((inputSpec) => {
+        if (inputSpec.dropdown === "without") {
+          standaloneInputs.push(inputSpec);
+        } else if (inputSpec.dropdown === "main") {
+          mainInput = inputSpec;
+        } else if (inputSpec.dropdown === "Assumptions") {
+          assumptionInputs.push(inputSpec);
         }
+      });
+
+      // Add standalone inputs first
+      standaloneInputs.forEach((inputSpec) => {
+        const input = activeModel.getInputForId(inputSpec.id);
+        if (input.kind === "slider") addSliderItem(input);
+        else if (input.kind === "switch") addSwitchItem(input);
+      });
+
+      // Process main input with dropdown
+      if (mainInput) {
+        const dropdownContainer = $('<div class="input-dropdown-group">');
+        const dropdownHeader = $('<div class="dropdown-header">');
+        const dropdownContent = $(
+          '<div class="dropdown-content" style="display: none;">'
+        );
+        const expandButton = $('<button class="expand-button">▶</button>');
+
+        // FIRST APPEND THE CONTAINER TO DOM
+        $("#inputs-content").append(dropdownContainer);
+        dropdownContainer.append(dropdownHeader, dropdownContent);
+
+        // Add main input AFTER container is in DOM
+        const mainInputInstance = activeModel.getInputForId(mainInput.id);
+        const sliderDiv = addSliderItem(mainInputInstance, dropdownHeader);
+
+        // Add expand button
+        sliderDiv.find(".input-title-row").prepend(expandButton);
+
+        // Add assumptions AFTER container is in DOM
+        assumptionInputs.forEach((inputSpec) => {
+          const input = activeModel.getInputForId(inputSpec.id);
+          if (input.kind === "slider") addSliderItem(input, dropdownContent);
+          else if (input.kind === "switch")
+            addSwitchItem(input, dropdownContent);
+        });
+
+        // Toggle handler
+        let isExpanded = false;
+        expandButton.on("click", () => {
+          isExpanded = !isExpanded;
+          dropdownContent.slideToggle();
+          expandButton.text(isExpanded ? "▼" : "▶");
+        });
       }
-    }
+    });
   } else {
-    const msg = `No sliders configured. You can edit 'config/inputs.csv' to get started.`;
+    const msg = `No sliders configured. Edit 'config/inputs.csv' to get started.`;
     $("#inputs-content").html(`<div style="padding-top: 10px">${msg}</div>`);
   }
 }
