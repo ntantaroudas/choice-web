@@ -14,6 +14,7 @@ let modelB;
 let activeModel;
 
 let graphViews = [];
+const addedSliderIds = new Set(); // Track which slider IDs have been added
 
 /**
  * Return the base (English) string for the given key.
@@ -76,35 +77,55 @@ function positionTooltip(tooltip) {
 }
 
 /*
+ * Function for the creation of Info Icon
+ */
+
+function createInfoIcon(hoverText) {
+  if (!hoverText) return null;
+
+  const infoIconContainer = $('<div class="info-icon-container">');
+  const icon = $('<div class="info-icon">i</div>');
+  const tooltip = $(`<div class="tooltip">${hoverText}</div>`);
+
+  infoIconContainer.append(icon, tooltip);
+
+  icon.on("mouseenter", function () {
+    positionTooltip(tooltip);
+    tooltip.css("visibility", "visible");
+  });
+
+  icon.on("mouseleave", function () {
+    tooltip.css("visibility", "hidden");
+  });
+
+  return infoIconContainer;
+}
+
+/*
  * INPUTS
  */
 
 function addSliderItem(sliderInput, container = $("#inputs-content")) {
   const spec = sliderInput.spec;
+
+  /*
+   * This is a custom solution, because the initial addSwitchItem implementation
+   * added the sliders Twice for each input.
+   * So, here I first check if this slider has already been added, to prevent duplicates.
+   */
+  if (addedSliderIds.has(spec.id)) {
+    // Check if already added
+    return; // Skip if duplicate
+  }
+  addedSliderIds.add(spec.id); // Mark as added
+
   // console.log(spec);
   const inputElemId = `input-${spec.id}`;
   const inputValue = $(`<div class="input-value"/>`);
 
   // Create info icon if description exists
   // and Position it correctly, inside the viewport (!).
-  let infoIcon = null;
-  if (spec.hoverDescription) {
-    const infoIconContainer = $('<div class="info-icon-container">');
-    const icon = $('<div class="info-icon">i</div>');
-    const tooltip = $(`<div class="tooltip">${spec.hoverDescription}</div>`);
-    infoIconContainer.append(icon, tooltip);
-    infoIcon = infoIconContainer;
-
-    // Event listeners for positioning and visibility
-    icon.on("mouseenter", function () {
-      positionTooltip(tooltip);
-      tooltip.css("visibility", "visible");
-    });
-
-    icon.on("mouseleave", function () {
-      tooltip.css("visibility", "hidden");
-    });
-  }
+  const infoIcon = createInfoIcon(spec.hoverDescription);
 
   // Title + Info Icon container. This should be in the far left.
   const sliderTitleAndInfoContainer = $(
@@ -183,52 +204,207 @@ function addSliderItem(sliderInput, container = $("#inputs-content")) {
 
 function addSwitchItem(switchInput) {
   const spec = switchInput.spec;
-  // console.log(spec);
   const inputElemId = `input-${spec.id}`;
-  function addCheckbox(desc) {
-    const div = $(`<div class="input-item"/>`).append([
-      $(
-        `<input id="${inputElemId}" class="switch-checkbox" name="${inputElemId}" type="checkbox"/>`
-      ),
-      $(
-        `<label for="${inputElemId}" class="switch-label">${str(
-          spec.labelKey
-        )}</label>`
-      ),
-      $(`<div class="input-desc">${desc}</div>`),
-    ]);
-    $("#inputs-content").append(div);
-    $(`#${inputElemId}`).on("change", function () {
-      if ($(this).is(":checked")) {
-        switchInput.set(spec.onValue);
-      } else {
-        switchInput.set(spec.offValue);
-      }
-      // activeModel.updateOutputs(); // remove? "activeModel.updateOutputs is not a function"
+
+  // Create button container
+  const buttonContainer = $('<div class="switch-button-container"></div>');
+  const onButton = $(
+    `<button class="switch-button">${str(spec.labelKey)}</button>`
+  );
+  const offButton = $(
+    `<button class="switch-button">${spec.secondLabel}</button>`
+  );
+
+  // Create slider containers
+  const onSlidersContainer = $(
+    '<div class="slider-group-container on-sliders"></div>'
+  );
+  const offSlidersContainer = $(
+    '<div class="slider-group-container off-sliders"></div>'
+  );
+
+  function updateUI(isOn) {
+    // Update button states
+    onButton.toggleClass("active", isOn);
+    offButton.toggleClass("active", !isOn);
+
+    // Toggle slider visibility
+    onSlidersContainer.toggle(isOn);
+    offSlidersContainer.toggle(!isOn);
+
+    // Update model value
+    switchInput.set(isOn ? spec.onValue : spec.offValue);
+  }
+
+  // Initial setup
+  const initialValue = switchInput.get() === spec.onValue;
+  updateUI(initialValue);
+
+  // Button click handlers
+  onButton.on("click", () => updateUI(true));
+  offButton.on("click", () => updateUI(false));
+
+  // Create switch UI
+  const div = $(`<div class="input-item switch-item"/>`).append([
+    buttonContainer.append(offButton, onButton),
+    $(
+      `<div class="input-desc">${
+        spec.descriptionKey ? str(spec.descriptionKey) : ""
+      }</div>`
+    ),
+    $('<div class="switch-sliders-container"/>').append(
+      offSlidersContainer,
+      onSlidersContainer
+    ),
+  ]);
+
+  $("#inputs-content").append(div);
+
+  // Add sliders to their respective containers
+  if (spec.slidersActiveWhenOn) {
+    spec.slidersActiveWhenOn.forEach((sliderId) => {
+      const slider = activeModel.getInputForId(sliderId);
+      addSliderItem(slider, onSlidersContainer);
     });
   }
 
-  if (!spec.slidersActiveWhenOff && spec.slidersActiveWhenOn) {
-    addCheckbox(
-      "The following slider will have an effect only when this is checked."
-    );
-    for (const sliderId of spec.slidersActiveWhenOn) {
+  if (spec.slidersActiveWhenOff) {
+    spec.slidersActiveWhenOff.forEach((sliderId) => {
       const slider = activeModel.getInputForId(sliderId);
-      addSliderItem(slider);
-    }
-  } else {
-    for (const sliderId of spec.slidersActiveWhenOff) {
-      const slider = activeModel.getInputForId(sliderId);
-      addSliderItem(slider);
-    }
-    addCheckbox(
-      "When this is unchecked, only the slider above has an effect, and the ones below are inactive (and vice versa)."
-    );
-    for (const sliderId of spec.slidersActiveWhenOn) {
-      const slider = activeModel.getInputForId(sliderId);
-      addSliderItem(slider);
-    }
+      addSliderItem(slider, offSlidersContainer);
+    });
   }
+}
+
+function addCombinedSlider(groupInputs, container) {
+  if (groupInputs.length !== 2) {
+    console.error("Combined slider group must contain exactly 2 sliders");
+    return;
+  }
+
+  const [startSpec, endSpec] = groupInputs;
+  const startInput = activeModel.getInputForId(startSpec.id);
+  const endInput = activeModel.getInputForId(endSpec.id);
+
+  // Get hover description and normal description from first spec that has it
+  const hoverDescription = [startSpec, endSpec].find(
+    (spec) => spec.hoverDescription
+  )?.hoverDescription;
+  const description = [startSpec, endSpec].find(
+    (spec) => spec.descriptionKey
+  )?.descriptionKey;
+
+  const infoIcon = createInfoIcon(hoverDescription);
+
+  // Create container with existing input-item styling
+  const div = $(`<div class="input-item combined-slider-group"/>`);
+
+  // Title row matching existing style
+  const titleRow = $(`
+    <div class="input-title-row">
+      <div class="slider-title-and-info-container">
+        <div class="input-title">${str(startSpec.labelKey)} - ${str(
+    endSpec.labelKey
+  )}</div>
+      </div>
+      <div class="value-units-container">
+        <div class="input-value">${startInput.get()} - ${endInput.get()}</div>
+        <div class="input-units">${str(startSpec.unitsKey)}</div>
+      </div>
+    </div>
+  `);
+
+  // Add info icon to the title container
+  titleRow.find(".slider-title-and-info-container").append(infoIcon);
+
+  // Slider row with existing styling
+  const sliderId = `combined-${startSpec.id}-${endSpec.id}`;
+  const sliderRow = $(`
+    <div class="input-slider-row">
+      <input id="${sliderId}" class="slider" type="text"/>
+    </div>
+  `);
+  const descRow = $(
+    `<div class="input-desc">${description ? str(description) : ""}</div>`
+  );
+
+  div.append(titleRow, sliderRow, descRow);
+  container.append(div);
+
+  // Initialize slider with existing styles
+  const slider = new Slider(`#${sliderId}`, {
+    min: Math.min(startSpec.minValue, endSpec.minValue),
+    max: Math.max(startSpec.maxValue, endSpec.maxValue),
+    value: [startInput.get(), endInput.get()],
+    range: true,
+    tooltip: "hide",
+    reversed: startSpec.reversed,
+    step: Math.min(startSpec.step, endSpec.step),
+    selection: "none",
+    rangeHighlights: [
+      {
+        start: startInput.get(),
+        end: endInput.get(),
+        class: "slider-rangeHighlight",
+      },
+    ],
+  });
+
+  // Update logic
+  slider.on("change", (change) => {
+    const [startValue, endValue] = change.newValue;
+    titleRow.find(".input-value").text(`${startValue} - ${endValue}`);
+
+    // Update range highlight
+    slider.setAttribute("rangeHighlights", [
+      {
+        start: startValue,
+        end: endValue,
+        class: "slider-rangeHighlight",
+      },
+    ]);
+
+    // Update model values
+    startInput.set(startValue);
+    endInput.set(endValue);
+  });
+}
+
+function createDropdownGroup(mainInputSpec, assumptionInputs) {
+  const dropdownContainer = $('<div class="input-dropdown-group">');
+  const dropdownHeader = $('<div class="dropdown-header">');
+  const dropdownContent = $(
+    '<div class="dropdown-content" style="display: none;">'
+  );
+  const expandButton = $('<button class="expand-button">▶</button>');
+
+  // Append container to DOM first
+  $("#inputs-content").append(dropdownContainer);
+  dropdownContainer.append(dropdownHeader, dropdownContent);
+
+  // Add main input
+  const mainInputInstance = activeModel.getInputForId(mainInputSpec.id);
+  const sliderDiv = addSliderItem(mainInputInstance, dropdownHeader);
+
+  // Add expand button
+  sliderDiv.find(".input-title-row").prepend(expandButton);
+
+  // Add assumption inputs
+  assumptionInputs.forEach((inputSpec) => {
+    const input = activeModel.getInputForId(inputSpec.id);
+    if (input.kind === "slider") addSliderItem(input, dropdownContent);
+    else if (input.kind === "switch") addSwitchItem(input, dropdownContent);
+  });
+
+  // Toggle handler
+  let isExpanded = false;
+  expandButton.on("click", () => {
+    isExpanded = !isExpanded;
+    dropdownContent.slideToggle();
+    expandButton.text(isExpanded ? "▼" : "▶");
+  });
+
+  return dropdownContainer;
 }
 
 /**
@@ -301,6 +477,7 @@ $("#input-category-selector-container").on(
 //
 function initInputsUI(category) {
   $("#inputs-content").empty();
+  addedSliderIds.clear(); // Reset tracked slider IDs
 
   // Group inputs by categoryId and input group
   const dynamicInputCategories = {};
@@ -322,16 +499,22 @@ function initInputsUI(category) {
 
   if (coreConfig.inputs.size > 0) {
     Object.entries(categoryGroups).forEach(([groupName, groupInputs]) => {
+      // Handle combined sliders first
+      if (groupInputs[0]?.secondaryType === "combined") {
+        addCombinedSlider(groupInputs, $("#inputs-content"));
+        return;
+      }
+      // Handle dropdowns
       const standaloneInputs = [];
       let mainInput = null;
       const assumptionInputs = [];
 
       groupInputs.forEach((inputSpec) => {
-        if (inputSpec.dropdown === "without") {
+        if (inputSpec.secondaryType === "without") {
           standaloneInputs.push(inputSpec);
-        } else if (inputSpec.dropdown === "main") {
+        } else if (inputSpec.secondaryType === "dropdown main") {
           mainInput = inputSpec;
-        } else if (inputSpec.dropdown === "Assumptions") {
+        } else if (inputSpec.secondaryType === "dropdown assumptions") {
           assumptionInputs.push(inputSpec);
         }
       });
@@ -345,39 +528,7 @@ function initInputsUI(category) {
 
       // Process main input with dropdown
       if (mainInput) {
-        const dropdownContainer = $('<div class="input-dropdown-group">');
-        const dropdownHeader = $('<div class="dropdown-header">');
-        const dropdownContent = $(
-          '<div class="dropdown-content" style="display: none;">'
-        );
-        const expandButton = $('<button class="expand-button">▶</button>');
-
-        // FIRST APPEND THE CONTAINER TO DOM
-        $("#inputs-content").append(dropdownContainer);
-        dropdownContainer.append(dropdownHeader, dropdownContent);
-
-        // Add main input AFTER container is in DOM
-        const mainInputInstance = activeModel.getInputForId(mainInput.id);
-        const sliderDiv = addSliderItem(mainInputInstance, dropdownHeader);
-
-        // Add expand button
-        sliderDiv.find(".input-title-row").prepend(expandButton);
-
-        // Add assumptions AFTER container is in DOM
-        assumptionInputs.forEach((inputSpec) => {
-          const input = activeModel.getInputForId(inputSpec.id);
-          if (input.kind === "slider") addSliderItem(input, dropdownContent);
-          else if (input.kind === "switch")
-            addSwitchItem(input, dropdownContent);
-        });
-
-        // Toggle handler
-        let isExpanded = false;
-        expandButton.on("click", () => {
-          isExpanded = !isExpanded;
-          dropdownContent.slideToggle();
-          expandButton.text(isExpanded ? "▼" : "▶");
-        });
+        createDropdownGroup(mainInput, assumptionInputs);
       }
     });
   } else {
