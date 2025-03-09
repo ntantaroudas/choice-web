@@ -224,23 +224,7 @@ p {
   padding-top: 10px;
 }
 
-/* Graph selector "dropdown list" */
-.graph-selector {
-  appearance: none; /* Remove default browser styles */
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 3px 5px;
-  color: #333;
-  cursor: pointer;
-  text-align: center;
-  transition: all 0.15s ease;
-}
-
-.graph-selector:hover {
-  background-color: #f1f1f1;
-  border-color: #aaa;
-}
+/* graph legends */
 
 .graph-legend {
   display: flex;
@@ -254,6 +238,70 @@ p {
   padding: 4px 8px 3px 8px;
   margin: 1px 3px;
   color: #fff;
+}
+
+/* Custom Graph selector (dropdown) */
+
+.custom-graph-selector {
+  position: relative;
+  width: 85%;
+  cursor: pointer;
+}
+
+.selected-option {
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  /* justify-content: space-between; */
+  justify-content: center;
+  align-items: center;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* margin-top: 4px; */
+  z-index: 1000;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.dropdown-option {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dropdown-option:hover {
+  background-color: #f5f5f5;
+}
+
+.option-title {
+  margin-right: 8px;
+}
+
+.classification-header {
+  padding: 8px 12px;
+  font-weight: bold;
+  background-color: #f0f0f0;
+  border-bottom: 1px solid #ddd;
+  color: #666;
+  cursor: default;
+}
+
+.dropdown-option {
+  padding: 8px 12px;
+}
+
+.dropdown-option:hover {
+  background-color: #f8f8f8;
 }
 
 /*
@@ -435,13 +483,13 @@ p {
 
 .info-icon {
   display: inline-block;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #4b5563;
   color: white;
   text-align: center;
-  font-size: 12px;
+  font-size: 9px;
   line-height: 16px;
   cursor: help;
 }

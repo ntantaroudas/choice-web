@@ -1,5 +1,7 @@
 import type { ChartConfiguration, ChartData, ChartDataSets } from "chart.js";
 import { Chart } from "chart.js";
+// import "chartjs-plugin-annotation";
+import annotationPlugin from "chartjs-plugin-annotation";
 
 import type {
   GraphDatasetSpec,
@@ -89,6 +91,11 @@ export interface GraphViewOptions {
 /**
  * Wraps a native chart element.
  */
+
+// is this necessary (?)
+Chart.pluginService.register(annotationPlugin);
+// ^^
+
 export class GraphView {
   private chart: Chart;
 
@@ -194,6 +201,22 @@ function lineChartJsConfig(
 ): ChartConfiguration {
   const spec = viewModel.spec;
 
+  /*
+   * Please read for "annotations" property (vertical dotted line in graphs)
+   *
+   * When putting "annotations:" inside "options" inside "ChartConfiguration", I got
+   * the following error:
+   *
+   * Object literal may only specify known properties, but 'annotation'
+   * does not exist in type 'ChartOptions'.
+   * Did you mean to write 'rotation'?ts(2561)
+   * index.d.ts(296, 9): The expected type comes from property 'options'
+   * which is declared here on type 'ChartConfiguration'
+   *
+   * Fixed this by creating a new file in "src" folder called
+   * "chartjs-plugin-annotation.d.ts" with this new option
+   */
+
   const chartConfig: ChartConfiguration = {
     type: "line",
     data,
@@ -236,8 +259,26 @@ function lineChartJsConfig(
           },
         ],
       },
+      annotation: {
+        drawTime: "afterDraw",
+        annotations: [
+          {
+            type: "line",
+            mode: "vertical",
+            scaleID: "x-axis-0",
+            value: 2020,
+            borderColor: "#666",
+            borderWidth: 1,
+            borderDash: [5, 5],
+            borderDashOffset: 0,
+            label: {
+              enabled: false,
+            },
+          },
+        ],
+      },
       tooltips: {
-        enabled: false, // TODO: Make configurable
+        enabled: true,
       },
     },
   };

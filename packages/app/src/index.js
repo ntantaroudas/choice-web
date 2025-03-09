@@ -587,36 +587,89 @@ function createGraphViewModel(graphSpec, model) {
  * Create a dropdown selector for switching graphs.
  */
 function createGraphSelector(category, currentGraphId, onGraphChange) {
-  // Get graph IDs for this category dynamically
-  const categoryGraphIds = [];
-  for (const spec of coreConfig.graphs.values()) {
-    if (spec.graphCategory === category) {
-      categoryGraphIds.push(spec.id);
-    }
-  }
+  // Get all graphs for the current category and group by classification
+  const graphs = Array.from(coreConfig.graphs.values()).filter(
+    (spec) => spec.graphCategory === category
+  );
+  const groups = {};
+  graphs.forEach((spec) => {
+    const classification = spec.classification || "Uncategorized";
+    if (!groups[classification]) groups[classification] = [];
+    groups[classification].push(spec);
+  });
 
-  const selector = $('<select class="graph-selector"></select>');
+  // Create custom dropdown container
+  const dropdownContainer = $('<div class="custom-graph-selector"></div>');
+  const selectedOption = $('<div class="selected-option"></div>');
+  const dropdownMenu = $('<div class="dropdown-menu"></div>').hide();
 
-  categoryGraphIds.forEach((graphId) => {
-    const graphSpec = coreConfig.graphs.get(graphId);
-    if (graphSpec) {
+  // Add classification groups to the dropdown
+  Object.entries(groups).forEach(([classification, specs]) => {
+    // Add classification header
+    const header = $(
+      `<div class="classification-header">${classification}</div>`
+    );
+    dropdownMenu.append(header);
+
+    // Add each graph under the classification
+    specs.forEach((spec) => {
       const option = $(
-        `<option value="${graphId}" ${
-          graphId === currentGraphId ? "selected" : ""
-        }>${str(graphSpec.titleKey)}</option>`
+        `<div class="dropdown-option" data-value="${spec.id}"></div>`
       );
-      selector.append(option);
+      const title = $(
+        `<span class="option-title">${str(spec.titleKey)}</span>`
+      );
+      const infoIcon = createInfoIcon(str(spec.descriptionKey));
+      option.append(title, infoIcon);
+      dropdownMenu.append(option);
+
+      // Set the initially selected graph
+      if (spec.id === currentGraphId) {
+        const selectedTitle = title.clone();
+        const selectedInfoIcon = createInfoIcon(str(spec.descriptionKey));
+        selectedOption.append(selectedTitle, selectedInfoIcon);
+      }
+    });
+  });
+
+  // Handle option selection
+  dropdownMenu.on("click", ".dropdown-option", function () {
+    const graphId = $(this).data("value");
+    const graphSpec = coreConfig.graphs.get(graphId);
+    if (!graphSpec) return;
+
+    // Update selected option display
+    const newTitle = $(
+      `<span class="option-title">${str(graphSpec.titleKey)}</span>`
+    );
+    const newInfoIcon = createInfoIcon(str(graphSpec.descriptionKey));
+    selectedOption.empty().append(newTitle, newInfoIcon);
+    dropdownMenu.hide();
+
+    // Trigger graph change callback
+    if (onGraphChange) onGraphChange(graphId);
+  });
+
+  // Toggle dropdown visibility
+  selectedOption.on("click", function (e) {
+    e.stopPropagation();
+    dropdownMenu.toggle();
+  });
+
+  // Close dropdown when clicking outside
+  $(document).on("click", function (e) {
+    // Only close if clicking outside the dropdown container
+    if (
+      !dropdownContainer.is(e.target) &&
+      dropdownContainer.has(e.target).length === 0
+    ) {
+      dropdownMenu.hide();
     }
   });
 
-  selector.on("change", function () {
-    const selectedGraphId = $(this).val();
-    if (onGraphChange) {
-      onGraphChange(selectedGraphId); // Trigger graph change for this selector
-    }
-  });
-
-  return selector;
+  // Assemble the dropdown
+  dropdownContainer.append(selectedOption, dropdownMenu);
+  return dropdownContainer;
 }
 
 function showGraph(graphSpec, outerContainer, category) {
